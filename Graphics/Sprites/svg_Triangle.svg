@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="326"
+   height="326"
+   viewBox="0 0 86.254168 86.254168"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter21"
+       x="-0.2122323"
+       y="-0.24237676"
+       width="1.4244646"
+       height="1.4847535">
+      <feFlood
+         result="flood"
+         in="SourceGraphic"
+         flood-opacity="0.498039"
+         flood-color="rgb(255,255,255)"
+         id="feFlood20" />
+      <feGaussianBlur
+         result="blur"
+         in="SourceGraphic"
+         stdDeviation="3.000000"
+         id="feGaussianBlur20" />
+      <feOffset
+         result="offset"
+         in="blur"
+         dx="-3.000000"
+         dy="-3.000000"
+         id="feOffset20" />
+      <feComposite
+         result="comp1"
+         operator="out"
+         in="flood"
+         in2="offset"
+         id="feComposite20" />
+      <feComposite
+         result="fbSourceGraphic"
+         operator="atop"
+         in="comp1"
+         in2="SourceGraphic"
+         id="feComposite21" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix21" />
+      <feFlood
+         id="feFlood21"
+         result="flood"
+         in="fbSourceGraphic"
+         flood-opacity="0.498039"
+         flood-color="rgb(0,0,0)" />
+      <feGaussianBlur
+         id="feGaussianBlur21"
+         result="blur"
+         in="fbSourceGraphic"
+         stdDeviation="3.000000" />
+      <feOffset
+         id="feOffset21"
+         result="offset"
+         in="blur"
+         dx="3.000000"
+         dy="3.000000" />
+      <feComposite
+         id="feComposite22"
+         result="comp1"
+         operator="out"
+         in="flood"
+         in2="offset" />
+      <feComposite
+         id="feComposite23"
+         result="comp2"
+         operator="atop"
+         in="comp1"
+         in2="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <g
+     id="layer1">
+    <g
+       id="path1"
+       transform="matrix(0.82616099,0,0,0.82616099,-4.7361988,27.028239)"
+       style="fill:#808080;fill-opacity:1;filter:url(#filter21)">
+      <path
+         style="fill:#808080;fill-opacity:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dashoffset:10.4;paint-order:markers fill stroke"
+         d="M 95.952814,52.411503 H 19.915167 l 38.018824,-65.850535 z"
+         id="path2" />
+      <path
+         style="fill:#808080;fill-opacity:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dashoffset:10.4;paint-order:markers fill stroke"
+         d="m 57.933594,-16.408203 c -1.060982,-8.3e-5 -2.041459,0.56572 -2.572266,1.484375 L 17.34375,50.925781 c -1.142485,1.980083 0.286221,4.454554 2.572266,4.455078 h 76.037109 c 2.286045,-5.24e-4 3.714751,-2.474995 2.572266,-4.455078 L 60.505859,-14.923828 c -0.530807,-0.918655 -1.511283,-1.484458 -2.572265,-1.484375 z"
+         id="path3" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+.ternary-slider__input {
+}
+
+.ternary-slider__drag-container {
+    background-image: url("project://database/Assets/_UI/Graphics/Sprites/sprt_Triangle.png?fileID=1130617326&guid=2f443599d2594564d87c7408b8c41264&type=3#triangle1_0");
+    -unity-background-scale-mode: stretch-to-fill;
+    flex-grow: 1;
+    padding-top: 5%;
+    padding-right: 5%;
+    padding-bottom: 4.5%;
+    padding-left: 5%;
+}
+
+.ternary-slider__drag-handle {
+    background-image: url("project://database/Assets/_UI/Graphics/Sprites/sprt_Knob.png?fileID=-2684344430345912852&guid=0f0dc8b0d8f501349beefc72d05891ba&type=3#circle1_0");
+    width: 10%;
+    height: 11.5%;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
