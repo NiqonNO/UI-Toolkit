@@ -7,20 +7,20 @@ namespace NiqonNO.UI
 {
 	public class NOTernarySlider : BaseField<Vector3>
 	{
-		private Label Label => labelElement;
+		//private Label Label => labelElement;
 		private readonly VisualElement DragContainer;
 		private readonly VisualElement DragHandle;
 		private readonly VisualElement InputContainer;
 
 		[CreateProperty] public int LowValue { get; set; }
 
-		[CreateProperty] public int HighValue { get; set; }
+		[CreateProperty] public int HighValue { get; set; } = 100;
 
 		[CreateProperty] public bool RoundToInt { get; set; }
 
-		private Vector3 NormalizedValue;
+		private Vector3 NormalizedValue = new (0.33f, 0.34f, 0.33f);
 
-		public NOTernarySlider() : this($"(0,0,0)\n(0,0,0)")
+		public NOTernarySlider() : this(string.Empty)
 		{
 		}
 
@@ -33,9 +33,9 @@ namespace NiqonNO.UI
 			InputContainer = this.Q(className: BaseField<bool>.inputUssClassName);
 			InputContainer.AddToClassList("ternary-slider__input");
 
-			DragContainer = new NOAspectRatioFitterElement(23, 20)
+			DragContainer = new VisualElement
 			{
-				name = "ternary-drag-container"
+				name = "ternary-drag-container",
 			};
 			DragContainer.AddToClassList("ternary-slider__drag-container");
 			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
@@ -45,7 +45,6 @@ namespace NiqonNO.UI
 			{
 				name = "ternary-drag-handle",
 				usageHints = UsageHints.DynamicTransform,
-				style = { translate = new Translate(Length.Percent(-50), Length.Percent(-50)) }
 			};
 			DragHandle.AddToClassList("ternary-slider__drag-handle");
 			DragHandle.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
@@ -53,6 +52,25 @@ namespace NiqonNO.UI
 
 			var dragger = new NOBarycentricDragger(DragHandle, SetNormalizedValue);
 			DragContainer.AddManipulator(dragger);
+			
+			#if UNITY_EDITOR
+			DragContainer.generateVisualContent += OnGenerateVisualContent;
+			
+			void OnGenerateVisualContent(MeshGenerationContext ctx)
+			{
+				var painter = ctx.painter2D;
+				painter.lineWidth = Mathf.Min(resolvedStyle.width, resolvedStyle.height) * 0.01f;
+				painter.lineCap = LineCap.Butt;
+				painter.strokeColor = Color.magenta;
+
+				painter.BeginPath();
+				painter.MoveTo(new Vector2(0.0f, 1.0f) * DragContainer.contentRect.size);
+				painter.LineTo(new Vector2(0.5f, 0.0f) * DragContainer.contentRect.size);
+				painter.LineTo(new Vector2(1.0f, 1.0f) * DragContainer.contentRect.size);
+				painter.LineTo(new Vector2(0.0f, 1.0f) * DragContainer.contentRect.size);
+				painter.Stroke();
+			}
+			#endif
 		}
 
 		public void SetNormalizedValue(Vector3 barycentric)
@@ -185,7 +203,6 @@ namespace NiqonNO.UI
 
 		private void UpdateDragElementPosition()
 		{
-			Label.text = $"{value}\n{NormalizedValue}";
 			var position = NormalizedValue.x * new Vector2(0.0f, 1.0f) +
 			               NormalizedValue.y * new Vector2(0.5f, 0.0f) +
 			               NormalizedValue.z * new Vector2(1.0f, 1.0f);
