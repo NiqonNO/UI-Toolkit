@@ -32,7 +32,6 @@ namespace NiqonNO.UI
             new NODataProvider { DisplayName = "4 | 4",  DisplayColor = Color.magenta },
             new NODataProvider { DisplayName = "5 | 5",  DisplayColor = Color.yellow }
         };
-        private List<VisualElement> ItemPool = new();
         
         private int _currentIndex;
 
@@ -60,8 +59,8 @@ namespace NiqonNO.UI
             };
             NextButton.AddToClassList("item-selector__button");
             NextButton.AddToClassList("item-selector__button-next");
-            
             ScrollContainer.Add(NextButton);
+            
             ViewportContainer.RegisterCallback<GeometryChangedEvent>(UpdatePositions);
         }
 
@@ -79,13 +78,12 @@ namespace NiqonNO.UI
             float containerWidth = ViewportContainer.contentRect.width;
             
             int count = Mathf.FloorToInt(containerWidth / (itemWidth + itemSpacing)) + 2;
-            if (ItemPool.Count >= count) return;
+            if (contentContainer.childCount >= count) return;
             
-            for (int i = ItemPool.Count; i < count; i++)
+            for (int i = contentContainer.childCount; i < count; i++)
             {
                 var item = CreateItem(i.ToString());
                 ContentContainer.Add(item);
-                ItemPool.Add(item);
             }
         }
         
@@ -150,7 +148,7 @@ namespace NiqonNO.UI
  
             if (ascending < descending)
             {
-                int transferIndex = _currentIndex + Mathf.CeilToInt(ItemPool.Count / 2.0f);
+                int transferIndex = _currentIndex + Mathf.CeilToInt(contentContainer.childCount / 2.0f);
                 for (int i = 0, j = transferIndex; i < ascending; i++, j--) 
                 {
                     SetData(contentContainer[0], DataCollection[(int)Mathf.Repeat(j, DataCollection.Count)]);
@@ -159,11 +157,11 @@ namespace NiqonNO.UI
             }
             else
             {
-                int transferIndex = _currentIndex - Mathf.CeilToInt(ItemPool.Count / 2.0f);
+                int transferIndex = _currentIndex - Mathf.CeilToInt(contentContainer.childCount / 2.0f);
                 for (int i = 0, j = transferIndex; i < descending; i++, j++)
                 { 
-                    SetData(contentContainer[ItemPool.Count - 1], DataCollection[(int)Mathf.Repeat(j, DataCollection.Count)]);
-                    contentContainer[ItemPool.Count - 1].SendToBack();
+                    SetData(contentContainer[contentContainer.childCount - 1], DataCollection[(int)Mathf.Repeat(j, DataCollection.Count)]);
+                    contentContainer[contentContainer.childCount - 1].SendToBack();
                 }
             }
 
@@ -179,6 +177,8 @@ namespace NiqonNO.UI
         void CenterContent()
         {
             Vector2 targetOffset = new Vector2((contentContainer.layout.width-ViewportContainer.layout.width) / 2.0f, 0);
+            if (contentContainer.childCount % 2.0f == 0)
+                targetOffset.x += 105f; 
             scrollOffset = targetOffset;
         }
         /*
