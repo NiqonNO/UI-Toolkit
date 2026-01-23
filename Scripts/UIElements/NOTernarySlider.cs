@@ -7,7 +7,6 @@ namespace NiqonNO.UI
 {
 	public class NOTernarySlider : BaseField<Vector3>
 	{
-		//private Label Label => labelElement;
 		private readonly VisualElement DragContainer;
 		private readonly VisualElement DragHandle;
 		private readonly VisualElement InputContainer;
@@ -28,30 +27,21 @@ namespace NiqonNO.UI
 		{
 			AddToClassList(NOUSS.TernaryClass);
 			labelElement.AddToClassList(NOUSS.TernaryLabelClass);
-			labelElement.style.alignSelf = Align.Center;
-			labelElement.style.unityTextAlign = TextAnchor.MiddleCenter;
-			InputContainer = this.Q(className: BaseField<Vector3>.inputUssClassName);
+			InputContainer = this.Q(className: inputUssClassName);
 			InputContainer.AddToClassList(NOUSS.TernaryInputContainerClass);
 
-			DragContainer = new VisualElement
-			{
-				name = "ternary-drag-area",
-			};
-			DragContainer.AddToClassList(NOUSS.TernaryDragAreaClass);
-			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
-			InputContainer.Add(DragContainer);
-
-			DragHandle = new VisualElement
-			{
-				name = "ternary-drag-handle",
-				usageHints = UsageHints.DynamicTransform,
-			};
+			DragHandle = new VisualElement { name = "ternary-drag-handle", usageHints = UsageHints.DynamicTransform, };
 			DragHandle.AddToClassList(NOUSS.TernaryHandleClass);
 			DragHandle.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
-			DragContainer.Add(DragHandle);
-
+			
 			var dragger = new NOBarycentricDragger(DragHandle, SetNormalizedValue);
+			DragContainer = new VisualElement { name = "ternary-drag-area", };
+			DragContainer.AddToClassList(NOUSS.TernaryDragAreaClass);
+			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 			DragContainer.AddManipulator(dragger);
+			
+			InputContainer.Add(DragContainer);
+			DragContainer.Add(DragHandle);
 			
 			#if UNITY_EDITOR
 			DragContainer.generateVisualContent += OnGenerateVisualContent;
