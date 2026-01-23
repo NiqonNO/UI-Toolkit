@@ -28,7 +28,7 @@
 		public static readonly string ItemSelectorViewportVerticalClass = $"{ItemSelectorViewportClass}--vertical";
 		public static readonly string ItemSelectorViewportHorizontalClass = $"{ItemSelectorViewportClass}--horizontal";
 		public static readonly string ItemSelectorContentContainerClass = $"{ItemSelectorClass}{ContentSuffix}";
-		public static readonly string ItemSelectorContentContainerVerticalClass = $"{ItemSelectorViewportClass}--vertical";
-		public static readonly string ItemSelectorContentContainerHorizontalClass = $"{ItemSelectorViewportClass}--horizontal";
+		public static readonly string ItemSelectorContentContainerVerticalClass = $"{ItemSelectorContentContainerClass}--vertical";
+		public static readonly string ItemSelectorContentContainerHorizontalClass = $"{ItemSelectorContentContainerClass}--horizontal";
 	}
 }
