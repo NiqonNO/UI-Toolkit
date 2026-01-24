@@ -41,22 +41,22 @@ namespace NiqonNO.UI
             InputContainer = this.Q(className: inputUssClassName);
             InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerClass);
 
-            PreviousButton = new Button(ScrollToPrevious) { name = "toggle-selector-previous",  };
-            PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
-            PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonPreviousClass);
-            
-            NextButton = new Button(ScrollToNext) { name = "toggle-selector-next", };
-            NextButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
-            NextButton.AddToClassList(NOUSS.ToggleSelectorButtonNextClass);
-
             ContentViewport = new VisualElement { name = "toggle-selector-content-viewport", pickingMode = PickingMode.Ignore, };
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePositions);
             
-            var scroller = new NOContentScroller();
+            var scroller = new NOContentScroller(GetCenteringOffset, JumpNext, JumpPrevious);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform, /*disableClipping = true,*/ };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.AddManipulator(scroller);
+            
+            PreviousButton = new Button(scroller.ScrollToPrevious) { name = "toggle-selector-previous",  };
+            PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
+            PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonPreviousClass);
+            
+            NextButton = new Button(scroller.ScrollToNext) { name = "toggle-selector-next", };
+            NextButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
+            NextButton.AddToClassList(NOUSS.ToggleSelectorButtonNextClass);
 
             
             InputContainer.Add(PreviousButton);
@@ -117,9 +117,6 @@ namespace NiqonNO.UI
             return item;
         }
 
-        private void ScrollToNext() => ScrollToIndex(CurrentIndex + 2);
-        private void ScrollToPrevious() => ScrollToIndex(CurrentIndex - 2);
-
         private void JumpToIndex(int index)
         {
             if (value == null)
@@ -133,29 +130,49 @@ namespace NiqonNO.UI
 
             for (int i = 0; i < childCount; i++, itemIndex++)
             {
-                SetData(ContentContainer[i], value.Items[(int)Mathf.Repeat(itemIndex, value.Items.Count)]);
+                BindTileData(ContentContainer[i], value.Items[(int)Mathf.Repeat(itemIndex, value.Items.Count)]);
             } 
 
-            //CenterContent();
+            CenterContent();
         }
 
-        private void ScrollToIndex(int newIndex)
+        private void JumpNext()
         {
-            if (value == null)
-                return;
-            
-            newIndex = (int)Mathf.Repeat(newIndex, value.Items.Count);
+            int transferIndex = CurrentIndex + Mathf.CeilToInt(ContentContainer.childCount / 2.0f);
+            BindTileData(ContentContainer[0], value.Items[(int)Mathf.Repeat(transferIndex, value.Items.Count)]);
+            ContentContainer[0].BringToFront();
 
-            int ascending = (newIndex - CurrentIndex + value.Items.Count) % value.Items.Count;
-            int descending = (CurrentIndex - newIndex + value.Items.Count) % value.Items.Count;
-
-            if (ascending < descending)
-                ScrollStep += ascending;
-            else
-                ScrollStep -= descending;
+            CurrentIndex = (int)Mathf.Repeat(++CurrentIndex, value.Items.Count);
         }
 
-        private void SetData(VisualElement visualElement, INOViewModel dataCollection)
+        private void JumpPrevious()
+        {
+            int transferIndex = CurrentIndex - Mathf.FloorToInt(ContentContainer.childCount / 2.0f) - 1;
+            BindTileData(ContentContainer[ContentContainer.childCount - 1], value.Items[(int)Mathf.Repeat(transferIndex, value.Items.Count)]);
+            ContentContainer[ContentContainer.childCount - 1].SendToBack();
+
+            CurrentIndex = (int)Mathf.Repeat(--CurrentIndex, value.Items.Count);
+        }
+
+        void CenterContent()
+        {
+            Vector2 targetOffset = GetCenteringOffset();
+            
+            Vector3 position = ContentContainer.transform.position;
+            position.x = -targetOffset.x;
+            position.y = -targetOffset.y;
+            ContentContainer.transform.position = position;
+        }
+
+        Vector2 GetCenteringOffset()
+        {
+            Vector2 targetOffset = new Vector2((ContentContainer.layout.width - ContentViewport.layout.width) / 2.0f, 0);
+            if (ContentContainer.childCount % 2.0f == 0)
+                targetOffset.x += 105f;
+            return targetOffset;
+        }
+
+        private void BindTileData(VisualElement visualElement, INOViewModel dataCollection)
         {
             visualElement.Q<Label>().text = dataCollection.DisplayName;
             visualElement.style.backgroundColor = dataCollection.DisplayColor;

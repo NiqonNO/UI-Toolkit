@@ -1,10 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
 	public class NOContentScroller : Manipulator
 	{
+		private readonly Func<Vector2> GetCenteringOffset;
+		private readonly Action OnReachNext;
+		private readonly Action OnReachPrevious;
+		
 		private IVisualElementScheduledItem Scheduler;
 		
 		private int _ScrollStep;
@@ -23,6 +28,13 @@ namespace NiqonNO.UI
 				CreateScheduler();
 			}
 		}
+
+		public NOContentScroller(Func<Vector2> getCenteringOffset, Action onReachNext, Action onReachPrevious)
+		{
+			GetCenteringOffset = getCenteringOffset;
+			OnReachNext = onReachNext;
+			OnReachPrevious = onReachPrevious;
+		}
 		
 		protected override void RegisterCallbacksOnTarget()
 		{
@@ -37,25 +49,36 @@ namespace NiqonNO.UI
 			Scheduler = target.schedule.Execute(Scroll).Every(0).Until(() => _ScrollStep == 0);
 		}
 		
+		public void ScrollToNext() => ScrollStep++;
+		public void ScrollToPrevious() => ScrollStep--;
+		
+		private void ScrollToIndex(int newIndex)
+		{
+			/*if (value == null)
+				return;
+            
+			newIndex = (int)Mathf.Repeat(newIndex, value.Items.Count);
+
+			int ascending = (newIndex - CurrentIndex + value.Items.Count) % value.Items.Count;
+			int descending = (CurrentIndex - newIndex + value.Items.Count) % value.Items.Count;
+
+			if (ascending < descending)
+				ScrollStep += ascending;
+			else
+				ScrollStep -= descending;*/
+		}
+		
 		private void Scroll(TimerState obj)
 		{
 			if (_ScrollStep > 0)
 			{
-				int transferIndex = CurrentIndex + Mathf.CeilToInt(target.childCount / 2.0f);
-				SetData(target[0], value.Items[(int)Mathf.Repeat(transferIndex, value.Items.Count)]);
-				target[0].BringToFront();
-
+				OnReachNext?.Invoke();
 				_ScrollStep--;
-				CurrentIndex = (int)Mathf.Repeat(++CurrentIndex, value.Items.Count);
 			}
 			else
 			{
-				int transferIndex = CurrentIndex - Mathf.FloorToInt(target.childCount / 2.0f) - 1;
-				SetData(target[target.childCount - 1], value.Items[(int)Mathf.Repeat(transferIndex, value.Items.Count)]);
-				target[target.childCount - 1].SendToBack();
-
+				OnReachPrevious?.Invoke();
 				_ScrollStep++;
-				CurrentIndex = (int)Mathf.Repeat(--CurrentIndex, value.Items.Count);
 			}
 
 			CenterContent();
@@ -63,10 +86,7 @@ namespace NiqonNO.UI
 		
 		void CenterContent()
 		{
-			Vector2 targetOffset =
-				new Vector2((target.layout.width - target.parent.layout.width) / 2.0f, 0);
-			if (target.childCount % 2.0f == 0)
-				targetOffset.x += 105f;
+			Vector2 targetOffset = GetCenteringOffset.Invoke();
             
 			Vector3 position = target.transform.position;
 			position.x = -targetOffset.x;
