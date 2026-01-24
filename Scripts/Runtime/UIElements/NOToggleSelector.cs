@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 namespace NiqonNO.UI
 {
     [UxmlElement]
-    public partial class NOToggleSelector : BaseField<NOViewModelListState>
+    public partial class NOToggleSelector : BaseField<INOViewModelListState>
     {
         private readonly VisualElement InputContainer;
         private readonly Button NextButton;

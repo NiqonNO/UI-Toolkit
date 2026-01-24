@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace NiqonNO.UI
 {
-	[Serializable]
-	public class NOViewModelListState
+	public interface INOViewModelListState
 	{
-		public List<INOViewModel> Items = new();
-		public int SelectedIndex;
+		public List<INOViewModel> Items { get; }
+	
+		public int SelectedIndex { get; set;  }
 
 		public INOViewModel Selected => Items[SelectedIndex];
 	}
