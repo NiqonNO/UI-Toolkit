@@ -42,25 +42,6 @@ namespace NiqonNO.UI
 			
 			InputContainer.Add(DragContainer);
 			DragContainer.Add(DragHandle);
-			
-			#if UNITY_EDITOR
-			DragContainer.generateVisualContent += OnGenerateVisualContent;
-			
-			void OnGenerateVisualContent(MeshGenerationContext ctx)
-			{
-				var painter = ctx.painter2D;
-				painter.lineWidth = Mathf.Min(resolvedStyle.width, resolvedStyle.height) * 0.01f;
-				painter.lineCap = LineCap.Butt;
-				painter.strokeColor = Color.magenta;
-
-				painter.BeginPath();
-				painter.MoveTo(new Vector2(0.0f, 1.0f) * DragContainer.contentRect.size);
-				painter.LineTo(new Vector2(0.5f, 0.0f) * DragContainer.contentRect.size);
-				painter.LineTo(new Vector2(1.0f, 1.0f) * DragContainer.contentRect.size);
-				painter.LineTo(new Vector2(0.0f, 1.0f) * DragContainer.contentRect.size);
-				painter.Stroke();
-			}
-			#endif
 		}
 
 		public void SetNormalizedValue(Vector3 barycentric)
