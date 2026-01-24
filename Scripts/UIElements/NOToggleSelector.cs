@@ -20,15 +20,17 @@ namespace NiqonNO.UI
             set => SetScrollViewMode(value);
         }
 
+        private int ItemCount => value?.Items?.Count??0;
         private int CurrentIndex
         {
             get => value?.SelectedIndex??0;
             set
             {
                 if (this.value == null) return;
-                this.value.SelectedIndex = value;
+                this.value.SelectedIndex = (int)Mathf.Repeat(value, ItemCount);
             }
         }
+        private INOViewModel GetItem(int idx) => ItemCount == 0 ? null : value?.Items[(int)Mathf.Repeat(idx, ItemCount)];
 
         public NOToggleSelector() : this(string.Empty)
         {
@@ -84,12 +86,12 @@ namespace NiqonNO.UI
             
             for (int i = ContentContainer.childCount; i < count; i++)
             {
-                var item = CreateItem();
+                var item = CreateItem(i);
                 ContentContainer.Add(item);
             }
         }
 
-        VisualElement CreateItem()
+        VisualElement CreateItem(int idx)
         {
             var item = new VisualElement
             {
@@ -111,6 +113,7 @@ namespace NiqonNO.UI
                     color = Color.black,
                     fontSize = 20,
                 },
+                text = $"{idx} | {idx}",
             };
 
             item.Add(label);
@@ -119,18 +122,15 @@ namespace NiqonNO.UI
 
         private void JumpToIndex(int index)
         {
-            if (value == null)
-                return; 
-            
             var childCount = ContentContainer.childCount;
             if (childCount == 0) return;
 
-            CurrentIndex = (int)Mathf.Repeat(index, value.Items.Count);
+            CurrentIndex = index;
             int itemIndex = index - Mathf.FloorToInt(childCount / 2.0f);
 
             for (int i = 0; i < childCount; i++, itemIndex++)
             {
-                BindTileData(ContentContainer[i], value.Items[(int)Mathf.Repeat(itemIndex, value.Items.Count)]);
+                BindTileData(ContentContainer[i], GetItem(itemIndex));
             } 
 
             CenterContent();
@@ -139,19 +139,17 @@ namespace NiqonNO.UI
         private void JumpNext()
         {
             int transferIndex = CurrentIndex + Mathf.CeilToInt(ContentContainer.childCount / 2.0f);
-            BindTileData(ContentContainer[0], value.Items[(int)Mathf.Repeat(transferIndex, value.Items.Count)]);
+            BindTileData(ContentContainer[0], GetItem(transferIndex));
             ContentContainer[0].BringToFront();
-
-            CurrentIndex = (int)Mathf.Repeat(++CurrentIndex, value.Items.Count);
+            CurrentIndex++;
         }
 
         private void JumpPrevious()
         {
             int transferIndex = CurrentIndex - Mathf.FloorToInt(ContentContainer.childCount / 2.0f) - 1;
-            BindTileData(ContentContainer[ContentContainer.childCount - 1], value.Items[(int)Mathf.Repeat(transferIndex, value.Items.Count)]);
+            BindTileData(ContentContainer[ContentContainer.childCount - 1], GetItem(transferIndex));
             ContentContainer[ContentContainer.childCount - 1].SendToBack();
-
-            CurrentIndex = (int)Mathf.Repeat(--CurrentIndex, value.Items.Count);
+            CurrentIndex--;
         }
 
         void CenterContent()
@@ -174,6 +172,7 @@ namespace NiqonNO.UI
 
         private void BindTileData(VisualElement visualElement, INOViewModel dataCollection)
         {
+            if(dataCollection == null) return;
             visualElement.Q<Label>().text = dataCollection.DisplayName;
             visualElement.style.backgroundColor = dataCollection.DisplayColor;
         }
