@@ -1,11 +1,14 @@
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
     [UxmlElement]
-    public partial class NOToggleSelector : BaseField<INOViewModelListState>
+    public partial class NOToggleSelector : NOCollectionView
     {
+
+        private readonly Label LabelElement;
         private readonly VisualElement InputContainer;
         private readonly Button NextButton;
         private readonly Button PreviousButton;
@@ -20,28 +23,22 @@ namespace NiqonNO.UI
             set => SetScrollViewMode(value);
         }
 
-        private int ItemCount => value?.Items?.Count??0;
-        private int CurrentIndex
-        {
-            get => value?.SelectedIndex??0;
-            set
-            {
-                if (this.value == null) return;
-                this.value.SelectedIndex = (int)Mathf.Repeat(value, ItemCount);
-            }
-        }
-        private INOViewModel GetItem(int idx) => ItemCount == 0 ? null : value?.Items[(int)Mathf.Repeat(idx, ItemCount)];
-
         public NOToggleSelector() : this(string.Empty)
         {
         }
 
-        public NOToggleSelector(string label) : base(label, new VisualElement())
+        public NOToggleSelector(string label) : base()
         {
             AddToClassList(NOUSS.ItemSelectorClass);
-            labelElement.AddToClassList(NOUSS.ToggleSelectorLabelClass);
-            InputContainer = this.Q(className: inputUssClassName);
+            if (label != null)
+            {
+                LabelElement = new Label(label);
+                LabelElement.AddToClassList(NOUSS.ToggleSelectorLabelClass);
+                Add(LabelElement);
+            }
+            InputContainer = new VisualElement();
             InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerClass);
+            Add(InputContainer);
 
             ContentViewport = new VisualElement { name = "toggle-selector-content-viewport", pickingMode = PickingMode.Ignore, };
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
@@ -72,7 +69,7 @@ namespace NiqonNO.UI
         private void UpdatePositions()
         {
             ResizeItemPool();
-            JumpToIndex(CurrentIndex);
+            JumpToIndex(SelectedIndex);
         }
 
         private void ResizeItemPool()
@@ -115,6 +112,17 @@ namespace NiqonNO.UI
                 },
                 text = $"{idx} | {idx}",
             };
+            
+            label.SetBinding(nameof(label.text), new DataBinding
+            {
+                dataSourcePath = new PropertyPath("_DisplayName_k__BackingField"),
+                bindingMode = BindingMode.ToTarget
+            });
+            item.SetBinding(nameof(item.style.backgroundColor), new DataBinding
+            {
+                dataSourcePath = new PropertyPath("_DisplayColor_k__BackingField"),
+                bindingMode = BindingMode.ToTarget
+            });
 
             item.Add(label);
             return item;
@@ -122,11 +130,11 @@ namespace NiqonNO.UI
 
         private void JumpToIndex(int index)
         {
-            var childCount = ContentContainer.childCount;
-            if (childCount == 0) return;
+            if (index < 0) return;
 
-            CurrentIndex = index;
-            int itemIndex = index - Mathf.FloorToInt(childCount / 2.0f);
+            SelectedIndex = index;
+            var childCount = ContentContainer.childCount;
+            int itemIndex = SelectedIndex - Mathf.FloorToInt(childCount / 2.0f);
 
             for (int i = 0; i < childCount; i++, itemIndex++)
             {
@@ -138,18 +146,18 @@ namespace NiqonNO.UI
 
         private void JumpNext()
         {
-            int transferIndex = CurrentIndex + Mathf.CeilToInt(ContentContainer.childCount / 2.0f);
+            int transferIndex = SelectedIndex + Mathf.CeilToInt(ContentContainer.childCount / 2.0f);
             BindTileData(ContentContainer[0], GetItem(transferIndex));
             ContentContainer[0].BringToFront();
-            CurrentIndex++;
+            SelectedIndex++;
         }
 
         private void JumpPrevious()
         {
-            int transferIndex = CurrentIndex - Mathf.FloorToInt(ContentContainer.childCount / 2.0f) - 1;
+            int transferIndex = SelectedIndex - Mathf.FloorToInt(ContentContainer.childCount / 2.0f) - 1;
             BindTileData(ContentContainer[ContentContainer.childCount - 1], GetItem(transferIndex));
             ContentContainer[ContentContainer.childCount - 1].SendToBack();
-            CurrentIndex--;
+            SelectedIndex--;
         }
 
         void CenterContent()
@@ -170,11 +178,12 @@ namespace NiqonNO.UI
             return targetOffset;
         }
 
-        private void BindTileData(VisualElement visualElement, INOViewModel dataCollection)
+        private void BindTileData(VisualElement visualElement, object dataCollection)
         {
-            if(dataCollection == null) return;
-            visualElement.Q<Label>().text = dataCollection.DisplayName;
-            visualElement.style.backgroundColor = dataCollection.DisplayColor;
+            //if(dataCollection == null) return;
+            visualElement.dataSource = dataCollection;
+            /*visualElement.Q<Label>().text = dataCollection.DisplayName;
+            visualElement.style.backgroundColor = dataCollection.DisplayColor;*/
         }
  
         private void SetScrollViewMode(ScrollViewMode mode)
