@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
-using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,7 +14,6 @@ namespace NiqonNO.UI
 		INotifyCollectionChanged CollectionNotifier;
 		
 		IList _ItemsSource;
-		[CreateProperty]
 		public IList ItemsSource
 		{
 			get => _ItemsSource;
@@ -35,7 +33,6 @@ namespace NiqonNO.UI
 		}
 		
 		int _SelectedIndex = -1;
-		[CreateProperty]
 		public int SelectedIndex
 		{
 			get => _SelectedIndex;
