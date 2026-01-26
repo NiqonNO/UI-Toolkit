@@ -162,10 +162,10 @@ namespace NiqonNO.UI
 			painter.strokeColor = Color.magenta;
 
 			painter.BeginPath();
-			painter.MoveTo(LeftCorner * rect.size);
-			painter.LineTo(TopCorner * rect.size);
-			painter.LineTo(RightCorner * rect.size);
-			painter.LineTo(LeftCorner * rect.size);
+			painter.MoveTo(rect.position + LeftCorner * rect.size);
+			painter.LineTo(rect.position + TopCorner * rect.size);
+			painter.LineTo(rect.position + RightCorner * rect.size);
+			painter.LineTo(rect.position + LeftCorner * rect.size);
 			painter.Stroke();
 		}
 #endif
