@@ -1,5 +1,4 @@
 using NiqonNO.UI.MVVM;
-using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,13 +15,29 @@ namespace NiqonNO.UI
         private readonly VisualElement ContentContainer;
         private readonly VisualElement ContentViewport;
         
-        private ScrollViewMode _Mode;
+        private ToggleSelectorDirection _Mode;
         [UxmlAttribute]
-        public ScrollViewMode Mode
+        public ToggleSelectorDirection Mode
         {
             get => _Mode;
             set => SetScrollViewMode(value);
         }
+        
+        private VisualTreeAsset _ItemTemplate;
+        [UxmlAttribute]
+        public VisualTreeAsset ItemTemplate
+        {
+            get => _ItemTemplate;
+            set
+            {
+                if (_ItemTemplate == value)
+                    return;
+                _ItemTemplate = value;
+                Rebuild();
+            }
+        }
+
+        private float ItemWidth => 160f;
 
         public NOToggleSelector() : this(string.Empty)
         {
@@ -43,10 +58,10 @@ namespace NiqonNO.UI
 
             ContentViewport = new VisualElement { name = "toggle-selector-content-viewport", pickingMode = PickingMode.Ignore, };
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
-            ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePositions);
+            ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePool);
             
             var scroller = new NOContentScroller(GetCenteringOffset, JumpNext, JumpPrevious);
-            ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform, /*disableClipping = true,*/ };
+            ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.AddManipulator(scroller);
             
@@ -65,70 +80,51 @@ namespace NiqonNO.UI
             InputContainer.Add(NextButton);
         }
 
-        private void UpdatePositions(GeometryChangedEvent evt) => UpdatePositions();
-
-        private void UpdatePositions()
+        private void Rebuild()
         {
+            ClearPool();
+            UpdatePool();
+        }
+
+        private void UpdatePool(GeometryChangedEvent evt) => UpdatePool();
+
+        private void UpdatePool()
+        {
+            if (ItemTemplate == null)
+                return;
+            
             ResizeItemPool();
             JumpToIndex(SelectedIndex);
         }
 
+        private void ClearPool()
+        {
+            while (ContentContainer.childCount > 0)
+            {
+                ContentContainer.RemoveAt(0);
+            }
+        }
         private void ResizeItemPool()
         {
-            float itemWidth = 200;
-            float itemSpacing = 10;
             float containerWidth = ContentViewport.contentRect.width;
 
-            int count = Mathf.FloorToInt(containerWidth / (itemWidth + itemSpacing)) + 2;
+            int count = Mathf.FloorToInt(containerWidth / ItemWidth) + 2;
             if (ContentContainer.childCount >= count) return;
             
             for (int i = ContentContainer.childCount; i < count; i++)
             {
-                var item = CreateItem(i);
+                var item = CreateItem();
                 ContentContainer.Add(item);
             }
         }
 
-        VisualElement CreateItem(int idx)
+        VisualElement CreateItem() => ItemTemplate.Instantiate();
+
+        protected override void OnItemsSourceChanged()
         {
-            var item = new VisualElement
-            {
-                style =
-                {
-                    width = 200,
-                    height = 150,
-                    marginRight = 5,
-                    marginLeft = 5,
-                    backgroundColor = Color.white,
-                }
-            };
-
-            var label = new Label
-            {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                    color = Color.black,
-                    fontSize = 20,
-                },
-                text = $"{idx} | {idx}",
-            };
-            
-            label.SetBinding(nameof(label.text), new DataBinding
-            {
-                dataSourcePath = new PropertyPath("_DisplayName_k__BackingField"),
-                bindingMode = BindingMode.ToTarget
-            });
-            item.SetBinding(nameof(item.style.backgroundColor), new DataBinding
-            {
-                dataSourcePath = new PropertyPath("_DisplayColor_k__BackingField"),
-                bindingMode = BindingMode.ToTarget
-            });
-
-            item.Add(label);
-            return item;
+            JumpToIndex(SelectedIndex); 
         }
-
+        
         private void JumpToIndex(int index)
         {
             if (index < 0) return;
@@ -175,7 +171,7 @@ namespace NiqonNO.UI
         {
             Vector2 targetOffset = new Vector2((ContentContainer.layout.width - ContentViewport.layout.width) / 2.0f, 0);
             if (ContentContainer.childCount % 2.0f == 0)
-                targetOffset.x += 105f;
+                targetOffset.x += ItemWidth/2f;
             return targetOffset;
         }
 
@@ -184,7 +180,7 @@ namespace NiqonNO.UI
             dataCollection?.Bind(visualElement);
         }
  
-        private void SetScrollViewMode(ScrollViewMode mode)
+        private void SetScrollViewMode(ToggleSelectorDirection mode)
         {
             _Mode = mode;
             InputContainer.RemoveFromClassList(NOUSS.ToggleSelectorInputContainerVerticalClass);
@@ -195,12 +191,12 @@ namespace NiqonNO.UI
             ContentContainer.RemoveFromClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass);
             switch (mode)
             {
-                case ScrollViewMode.Vertical:
+                case ToggleSelectorDirection.Vertical:
                     InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerVerticalClass);
                     ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportVerticalClass);
                     ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerVerticalClass);
                     break;
-                case ScrollViewMode.Horizontal:
+                case ToggleSelectorDirection.Horizontal:
                     InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerHorizontalClass);
                     ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportHorizontalClass);
                     ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass);

@@ -14,19 +14,34 @@ namespace NiqonNO.UI
 		
 		INotifyCollectionChanged CollectionNotifier;
 
-		[UxmlAttribute][CreateProperty]
-		private NOCollectionState CollectionState;
+		[UxmlAttribute]
+		private NOCollectionState _CollectionState;
 
+		[CreateProperty]
+		protected NOCollectionState CollectionState
+		{
+			get => _CollectionState;
+			private set
+			{
+				if (_CollectionState == value)
+					return;
+				
+				_CollectionState = value;
+				NotifyPropertyChanged(in CollectionStateProperty);
+				OnItemsSourceChanged();
+			}
+		}
+		
 		protected List<INOBindingContext> DataSource
 		{
-			get => CollectionState.DataSource;
+			get => _CollectionState.DataSource;
 			set
 			{
-				if (/*CollectionState == null || */ReferenceEquals(CollectionState.DataSource, value))
+				if (ReferenceEquals(_CollectionState.DataSource, value))
 					return;
 
 				UnsubscribeCollection();
-				CollectionState.DataSource = value;
+				_CollectionState.DataSource = value;
 				SubscribeCollection();
 
 				ClampSelection();
@@ -37,13 +52,13 @@ namespace NiqonNO.UI
 		
 		protected int SelectedIndex
 		{
-			get => CollectionState.SelectedItem;
+			get => _CollectionState.SelectedItem;
 			set
 			{
-				if (/*CollectionState == null || */CollectionState.SelectedItem == value)
+				if (_CollectionState.SelectedItem == value)
 					return;
 
-				CollectionState.SelectedItem = value;
+				_CollectionState.SelectedItem = value;
 				
 				ClampSelection();
 				NotifyPropertyChanged(in CollectionStateProperty);
@@ -51,12 +66,12 @@ namespace NiqonNO.UI
 			}
 		}
 		
-		public int CollectionLength => CollectionState.DataSource?.Count ?? 0;
+		public int CollectionLength => DataSource?.Count ?? 0;
 		
 
 		void SubscribeCollection()
 		{
-			CollectionNotifier = CollectionState.DataSource as INotifyCollectionChanged;
+			CollectionNotifier = _CollectionState.DataSource as INotifyCollectionChanged;
 			if (CollectionNotifier != null)
 				CollectionNotifier.CollectionChanged += OnCollectionChanged;
 		}
@@ -77,11 +92,11 @@ namespace NiqonNO.UI
 		{
 			if (CollectionLength== 0)
 			{
-				CollectionState.SelectedItem = -1;
+				SelectedIndex = -1;
 				return;
 			}
 
-			CollectionState.SelectedItem = (int)Mathf.Repeat(CollectionState.SelectedItem, CollectionLength);
+			SelectedIndex = (int)Mathf.Repeat(SelectedIndex, CollectionLength);
 		}
 		
 		protected virtual void OnItemsSourceChanged() {}
