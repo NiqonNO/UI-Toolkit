@@ -14,7 +14,7 @@ namespace NiqonNO.UI.MVVM
 		public virtual void Init(TContext bindingContext)
 		{
 			BindingContext = bindingContext;
-			BindingContext.Bind(Document);
+			BindingContext.Bind(Document.rootVisualElement);
 		}
 	}
 }

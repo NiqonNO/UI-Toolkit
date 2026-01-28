@@ -1,3 +1,4 @@
+using NiqonNO.UI.MVVM;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -178,12 +179,9 @@ namespace NiqonNO.UI
             return targetOffset;
         }
 
-        private void BindTileData(VisualElement visualElement, object dataCollection)
+        private void BindTileData(VisualElement visualElement, INOBindingContext dataCollection)
         {
-            //if(dataCollection == null) return;
-            visualElement.dataSource = dataCollection;
-            /*visualElement.Q<Label>().text = dataCollection.DisplayName;
-            visualElement.style.backgroundColor = dataCollection.DisplayColor;*/
+            dataCollection?.Bind(visualElement);
         }
  
         private void SetScrollViewMode(ScrollViewMode mode)

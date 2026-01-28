@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using NiqonNO.UI.MVVM;
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,53 +10,53 @@ namespace NiqonNO.UI
 	[UxmlElement]
 	public abstract partial class NOCollectionView : BindableElement
 	{
-		internal static readonly BindingId ItemsSourceProperty = new (nameof(ItemsSource));
-		internal static readonly BindingId SelectedIndexProperty = new (nameof(SelectedIndex));
-
-		INotifyCollectionChanged CollectionNotifier;
+		internal static readonly BindingId CollectionStateProperty = new (nameof(CollectionState));
 		
-		IList _ItemsSource;
-		public IList ItemsSource
+		INotifyCollectionChanged CollectionNotifier;
+
+		[UxmlAttribute][CreateProperty]
+		private NOCollectionState CollectionState;
+
+		protected List<INOBindingContext> DataSource
 		{
-			get => _ItemsSource;
+			get => CollectionState.DataSource;
 			set
 			{
-				if (ReferenceEquals(_ItemsSource, value))
+				if (/*CollectionState == null || */ReferenceEquals(CollectionState.DataSource, value))
 					return;
 
 				UnsubscribeCollection();
-				_ItemsSource = value;
+				CollectionState.DataSource = value;
 				SubscribeCollection();
 
 				ClampSelection();
-				NotifyPropertyChanged(in ItemsSourceProperty);
+				NotifyPropertyChanged(in CollectionStateProperty);
 				OnItemsSourceChanged();
 			}
 		}
 		
-		int _SelectedIndex = -1;
-		public int SelectedIndex
+		protected int SelectedIndex
 		{
-			get => _SelectedIndex;
+			get => CollectionState.SelectedItem;
 			set
 			{
-				if (_SelectedIndex == value)
+				if (/*CollectionState == null || */CollectionState.SelectedItem == value)
 					return;
 
-				_SelectedIndex = value;
+				CollectionState.SelectedItem = value;
 				
 				ClampSelection();
-				NotifyPropertyChanged(in SelectedIndexProperty);
+				NotifyPropertyChanged(in CollectionStateProperty);
 				OnSelectionChanged();
 			}
 		}
 		
-		public int CollectionLength => _ItemsSource?.Count ?? 0;
+		public int CollectionLength => CollectionState.DataSource?.Count ?? 0;
 		
 
 		void SubscribeCollection()
 		{
-			CollectionNotifier = _ItemsSource as INotifyCollectionChanged;
+			CollectionNotifier = CollectionState.DataSource as INotifyCollectionChanged;
 			if (CollectionNotifier != null)
 				CollectionNotifier.CollectionChanged += OnCollectionChanged;
 		}
@@ -75,25 +77,25 @@ namespace NiqonNO.UI
 		{
 			if (CollectionLength== 0)
 			{
-				_SelectedIndex = -1;
+				CollectionState.SelectedItem = -1;
 				return;
 			}
 
-			_SelectedIndex = (int)Mathf.Repeat(_SelectedIndex, CollectionLength);
+			CollectionState.SelectedItem = (int)Mathf.Repeat(CollectionState.SelectedItem, CollectionLength);
 		}
 		
 		protected virtual void OnItemsSourceChanged() {}
 		protected virtual void OnSelectionChanged() {}
 
-		protected object GetItem(int index)
+		protected INOBindingContext GetItem(int index)
 		{
-			if (_ItemsSource == null)
+			if (CollectionState.DataSource == null)
 				return null;
 
 			if (index < 0 || index >= CollectionLength)
 				index = (int)Mathf.Repeat(index, CollectionLength);
 
-			return _ItemsSource[index];
+			return CollectionState.DataSource[index];
 		}
 	}
 }
