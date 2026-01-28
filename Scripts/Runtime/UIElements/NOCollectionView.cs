@@ -15,10 +15,10 @@ namespace NiqonNO.UI
 		INotifyCollectionChanged CollectionNotifier;
 
 		[UxmlAttribute]
-		private NOCollectionState _CollectionState;
+		private NOBindingCollectionState _CollectionState;
 
 		[CreateProperty]
-		protected NOCollectionState CollectionState
+		protected NOBindingCollectionState CollectionState
 		{
 			get => _CollectionState;
 			private set
@@ -32,7 +32,7 @@ namespace NiqonNO.UI
 			}
 		}
 		
-		protected List<INOBindingContext> DataSource
+		protected IList<INOBindingContext> DataSource
 		{
 			get => _CollectionState.DataSource;
 			set
