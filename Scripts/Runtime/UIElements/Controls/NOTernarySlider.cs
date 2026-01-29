@@ -194,19 +194,17 @@ namespace NiqonNO.UI
 		public new class UxmlSerializedData : BaseField<Vector3>.UxmlSerializedData
 		{
 #pragma warning disable 649
-			[SerializeField] private int LowValue;
-
 			[HideInInspector] [SerializeField] [UxmlIgnore]
 			private UxmlAttributeFlags LowValue_UxmlAttributeFlags;
-
-			[SerializeField] private int HighValue;
+			[SerializeField] private int LowValue;
 
 			[SerializeField] [HideInInspector] [UxmlIgnore]
 			private UxmlAttributeFlags HighValue_UxmlAttributeFlags;
+			[SerializeField] private int HighValue;
 
-			[SerializeField] private bool RoundToInt;
 			[SerializeField] [HideInInspector] [UxmlIgnore]
 			private UxmlAttributeFlags RoundToInt_UxmlAttributeFlags;
+			[SerializeField] private bool RoundToInt;
 #pragma warning restore 649
 
 			[System.Diagnostics.Conditional("UNITY_EDITOR")]

@@ -1,102 +1,60 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Generic;
 using NiqonNO.UI.MVVM;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace NiqonNO.UI
 {
-	[UxmlElement]
-	public abstract partial class NOCollectionView : BindableElement
+	public abstract class NOCollectionView : BindableElement
 	{
-		internal static readonly BindingId CollectionStateProperty = new (nameof(CollectionState));
+		internal static readonly BindingId SourceCollectionProperty = (BindingId) nameof (SourceCollection);
+		internal static readonly BindingId SelectedIndexProperty = (BindingId) nameof (SelectedIndex);
 		
-		INotifyCollectionChanged CollectionNotifier;
-
-		[UxmlAttribute]
-		private NOBindingCollectionState _CollectionState;
-
+		protected List<Object> _SourceCollection;
 		[CreateProperty]
-		protected NOBindingCollectionState CollectionState
+		protected List<Object> SourceCollection
 		{
-			get => _CollectionState;
-			private set
-			{
-				if (_CollectionState == value)
-					return;
-				
-				_CollectionState = value;
-				NotifyPropertyChanged(in CollectionStateProperty);
-				OnItemsSourceChanged();
-			}
-		}
-		
-		protected IList<INOBindingContext> DataSource
-		{
-			get => _CollectionState.DataSource;
+			get => _SourceCollection;
 			set
 			{
-				if (ReferenceEquals(_CollectionState.DataSource, value))
+				if (ReferenceEquals(_SourceCollection, value))
 					return;
-
-				UnsubscribeCollection();
-				_CollectionState.DataSource = value;
-				SubscribeCollection();
-
-				ClampSelection();
-				NotifyPropertyChanged(in CollectionStateProperty);
+				
+				_SourceCollection = value;
+				
+				SelectedIndex = CircularIndex(_SelectedIndex);
 				OnItemsSourceChanged();
+				NotifyPropertyChanged(SourceCollectionProperty);
 			}
 		}
-		
+
+		protected int _SelectedIndex;
+		[CreateProperty]
 		protected int SelectedIndex
 		{
-			get => _CollectionState.SelectedItem;
+			get => _SelectedIndex;
 			set
 			{
-				if (_CollectionState.SelectedItem == value)
+				if (_SelectedIndex == value)
 					return;
 
-				_CollectionState.SelectedItem = value;
-				
-				ClampSelection();
-				NotifyPropertyChanged(in CollectionStateProperty);
+				_SelectedIndex = CircularIndex(value);
 				OnSelectionChanged();
+				NotifyPropertyChanged(SelectedIndexProperty);
 			}
 		}
 		
-		public int CollectionLength => DataSource?.Count ?? 0;
-		
+		public int CollectionLength => _SourceCollection?.Count ?? 0;
 
-		void SubscribeCollection()
+		int CircularIndex(int idx)
 		{
-			CollectionNotifier = _CollectionState.DataSource as INotifyCollectionChanged;
-			if (CollectionNotifier != null)
-				CollectionNotifier.CollectionChanged += OnCollectionChanged;
-		}
-		void UnsubscribeCollection()
-		{
-			if (CollectionNotifier != null)
-				CollectionNotifier.CollectionChanged -= OnCollectionChanged;
-			CollectionNotifier = null;
-		}
+			if (CollectionLength == 0)
+				return -1;
 
-		void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-		{
-			ClampSelection();
-			OnItemsSourceChanged();
-		}
-
-		void ClampSelection()
-		{
-			if (CollectionLength== 0)
-			{
-				SelectedIndex = -1;
-				return;
-			}
-
-			SelectedIndex = (int)Mathf.Repeat(SelectedIndex, CollectionLength);
+			return (int)Mathf.Repeat(idx, CollectionLength);
 		}
 		
 		protected virtual void OnItemsSourceChanged() {}
@@ -104,13 +62,52 @@ namespace NiqonNO.UI
 
 		protected INOBindingContext GetItem(int index)
 		{
-			if (CollectionState.DataSource == null)
+			if (_SourceCollection == null)
 				return null;
 
 			if (index < 0 || index >= CollectionLength)
 				index = (int)Mathf.Repeat(index, CollectionLength);
 
-			return CollectionState.DataSource[index];
+			return _SourceCollection[index] as INOBindingContext;
+		}
+		
+		[Serializable]
+		public new abstract class UxmlSerializedData : BindableElement.UxmlSerializedData
+		{
+#pragma warning disable 649
+			[SerializeField] [HideInInspector] [UxmlIgnore]
+			private UxmlAttributeFlags SourceCollection_UxmlAttributeFlags;
+			[SerializeReference] private List<Object> SourceCollection;
+			
+			[SerializeField] [HideInInspector] [UxmlIgnore]
+			private UxmlAttributeFlags SelectedIndex_UxmlAttributeFlags;
+			[SerializeReference] private int SelectedIndex;
+#pragma warning restore 649
+			
+			[System.Diagnostics.Conditional("UNITY_EDITOR")]
+			public new static void Register()
+			{
+				BindableElement.UxmlSerializedData.Register();
+				UxmlDescriptionCache.RegisterType(typeof (UxmlSerializedData), 
+					new UxmlAttributeNames[]
+					{
+						new("SourceCollection", "source-collection", null, Array.Empty<string>()),
+						new("SelectedIndex", "selected-index", null, Array.Empty<string>())
+					});
+			}
+
+			//public override object CreateInstance() => (object) new NOCollectionView();
+
+			public override void Deserialize(object obj)
+			{
+				
+				NOCollectionView view = (NOCollectionView)obj;
+				if (ShouldWriteAttributeValue(SourceCollection_UxmlAttributeFlags))
+					view.SourceCollection = SourceCollection;
+				if (ShouldWriteAttributeValue(SelectedIndex_UxmlAttributeFlags))
+					view.SelectedIndex = SelectedIndex;
+				base.Deserialize(obj);
+			}
 		}
 	}
 }
