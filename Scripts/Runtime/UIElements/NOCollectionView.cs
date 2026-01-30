@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using NiqonNO.UI.MVVM;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace NiqonNO.UI
 {
-	public abstract class NOCollectionView : BindableElement
+	public abstract class NOCollectionView<T> : BindableElement
 	{
 		internal static readonly BindingId SourceCollectionProperty = (BindingId) nameof (SourceCollection);
 		internal static readonly BindingId SelectedIndexProperty = (BindingId) nameof (SelectedIndex);
 		
-		protected List<Object> _SourceCollection;
+		protected List<T> _SourceCollection;
 		[CreateProperty]
-		protected List<Object> SourceCollection
+		protected List<T> SourceCollection
 		{
 			get => _SourceCollection;
 			set
@@ -60,15 +58,15 @@ namespace NiqonNO.UI
 		protected virtual void OnItemsSourceChanged() {}
 		protected virtual void OnSelectionChanged() {}
 
-		protected INOBindingContext GetItem(int index)
+		protected T GetItem(int index)
 		{
 			if (_SourceCollection == null)
-				return null;
+				return default;
 
 			if (index < 0 || index >= CollectionLength)
 				index = (int)Mathf.Repeat(index, CollectionLength);
 
-			return _SourceCollection[index] as INOBindingContext;
+			return _SourceCollection[index];
 		}
 		
 		[Serializable]
@@ -77,11 +75,11 @@ namespace NiqonNO.UI
 #pragma warning disable 649
 			[SerializeField] [HideInInspector] [UxmlIgnore]
 			private UxmlAttributeFlags SourceCollection_UxmlAttributeFlags;
-			[SerializeReference] private List<Object> SourceCollection;
+			[SerializeReference] private List<T> SourceCollection;
 			
 			[SerializeField] [HideInInspector] [UxmlIgnore]
 			private UxmlAttributeFlags SelectedIndex_UxmlAttributeFlags;
-			[SerializeReference] private int SelectedIndex;
+			[SerializeField] private int SelectedIndex;
 #pragma warning restore 649
 			
 			[System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -95,13 +93,12 @@ namespace NiqonNO.UI
 						new("SelectedIndex", "selected-index", null, Array.Empty<string>())
 					});
 			}
-
-			//public override object CreateInstance() => (object) new NOCollectionView();
+			
+			//public override object CreateInstance() => (object) new NOCollectionView<T>();
 
 			public override void Deserialize(object obj)
 			{
-				
-				NOCollectionView view = (NOCollectionView)obj;
+				NOCollectionView<T> view = (NOCollectionView<T>)obj;
 				if (ShouldWriteAttributeValue(SourceCollection_UxmlAttributeFlags))
 					view.SourceCollection = SourceCollection;
 				if (ShouldWriteAttributeValue(SelectedIndex_UxmlAttributeFlags))

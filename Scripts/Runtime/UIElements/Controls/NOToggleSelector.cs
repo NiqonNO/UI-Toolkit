@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 namespace NiqonNO.UI
 {
     [UxmlElement]
-    public partial class NOToggleSelector : NOCollectionView
+    public partial class NOToggleSelector : NOCollectionView<INOBindingContext>
     {
 
         private readonly Label LabelElement;
