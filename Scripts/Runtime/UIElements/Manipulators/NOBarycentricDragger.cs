@@ -22,6 +22,7 @@ namespace NiqonNO.UI
 			IsActive = false;
 			PointerId = -1;
 			activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse });
+			
 			OnDrag = dragHandler;
 			Handle = dragHandle;
 		}
@@ -79,9 +80,9 @@ namespace NiqonNO.UI
 			if (!IsActive || !target.HasPointerCapture(PointerId))
 				return;
 
-			UpdateDrag(evt.localPosition);
-
 			evt.StopPropagation();
+			
+			UpdateDrag(evt.localPosition);
 		}
 
 		private void OnPointerUp(PointerUpEvent evt)
