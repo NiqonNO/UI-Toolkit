@@ -142,7 +142,7 @@ namespace NiqonNO.UI
 			UpdatePosition();
 		}
 		
-		private void UpdatePosition()
+		public void UpdatePosition()
 		{
 			Vector3 position = target.transform.position;
 			position[Axis] = -((target.layout.size[Axis] - target.parent.layout.size[Axis]) / 2.0f) + DragDelta;

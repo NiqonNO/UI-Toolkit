@@ -1,3 +1,4 @@
+using System;
 using NiqonNO.UI.MVVM;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,13 +8,14 @@ namespace NiqonNO.UI
     [UxmlElement]
     public partial class NOToggleSelector : NOCollectionView<INOBindingContext>
     {
-
         private readonly Label LabelElement;
         private readonly VisualElement InputContainer;
         private readonly Button NextButton;
         private readonly Button PreviousButton;
         private readonly VisualElement ContentContainer;
         private readonly VisualElement ContentViewport;
+        
+        private event Action RefreshGeometryEvent;
         
         private ToggleSelectorDirection _Mode;
         [UxmlAttribute]
@@ -64,6 +66,7 @@ namespace NiqonNO.UI
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.AddManipulator(scroller);
+            RefreshGeometryEvent += scroller.UpdatePosition;
             
             PreviousButton = new Button(scroller.ScrollToPrevious) { name = "toggle-selector-previous",  };
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
@@ -135,6 +138,8 @@ namespace NiqonNO.UI
             {
                 BindTileData(ContentContainer[i], GetItem(itemIndex));
             }
+            
+            RefreshGeometryEvent?.Invoke();
         }
         
         private void JumpNext()
