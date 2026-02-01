@@ -6,7 +6,6 @@ namespace NiqonNO.UI
 {
 	public class NOContentScroller : PointerManipulator
 	{
-		private readonly Func<Vector2> GetCenteringOffset;
 		private readonly Action OnReachNext;
 		private readonly Action OnReachPrevious;
 		
@@ -19,22 +18,20 @@ namespace NiqonNO.UI
 		private bool Hold;
 		private bool Dragging;
 		private int PointerId;
-		private float Velocity;
 		private float DragDelta;
 
-		public NOContentScroller(Func<Vector2> getCenteringOffset, Action onReachNext, Action onReachPrevious)
+		public NOContentScroller(Action onReachNext, Action onReachPrevious)
 		{
 			Hold = false;
 			Dragging = false;
 			PointerId = -1;
-			Velocity = 0f;
+			DragDelta = 0;
 			activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse });
-			
-			GetCenteringOffset = getCenteringOffset;
+
 			OnReachNext = onReachNext;
 			OnReachPrevious = onReachPrevious;
 		}
-		
+
 		protected override void RegisterCallbacksOnTarget()
 		{
 			target.RegisterCallback<PointerDownEvent>(OnPointerDown);
@@ -63,7 +60,6 @@ namespace NiqonNO.UI
 			if (!CanStartManipulation(evt)) return;
 
 			Hold = true;
-			Velocity = 0f;
 			PointerId = evt.pointerId;
 			target.CapturePointer(PointerId);
 			evt.StopPropagation();
@@ -103,10 +99,11 @@ namespace NiqonNO.UI
 		private void UpdateDrag(PointerMoveEvent evt)
 		{
 			DragDelta += evt.deltaPosition[Axis];
-
-			int steps = Mathf.FloorToInt(Mathf.Abs(DragDelta) / TileSize) * (int)Mathf.Sign(DragDelta);
-			DragDelta -= TileSize * steps;
-			Scroll(-steps);
+			
+			float offset = Mathf.Abs(DragDelta) + TileSize / 2f;
+			int indexSteps = Mathf.FloorToInt(offset / TileSize) * (int)Mathf.Sign(DragDelta);
+			DragDelta -= TileSize * indexSteps;
+			Scroll(-indexSteps);
 		}
 
 		private void OnEndDrag()
@@ -114,32 +111,18 @@ namespace NiqonNO.UI
 			Dragging = false;
 			
 			DragDelta = 0;
-			CenterContent();
+			UpdatePosition();
 		}
 		
-		private void OnScroll(WheelEvent eventData)
+		private void OnScroll(WheelEvent evt)
 		{
-	        
+			if (Hold) return;
+			
+			DragDelta += evt.delta.y;
 		}
 		
 		public void ScrollToNext() => Scroll(1);
 		public void ScrollToPrevious() => Scroll(-1);
-		
-		private void ScrollToIndex(int newIndex)
-		{
-			/*if (value == null)
-				return;
-            
-			newIndex = (int)Mathf.Repeat(newIndex, value.Items.Count);
-
-			int ascending = (newIndex - CurrentIndex + value.Items.Count) % value.Items.Count;
-			int descending = (CurrentIndex - newIndex + value.Items.Count) % value.Items.Count;
-
-			if (ascending < descending)
-				ScrollStep += ascending;
-			else
-				ScrollStep -= descending;*/
-		}
 		
 		private void Scroll(int scrollStep)
 		{
@@ -156,17 +139,13 @@ namespace NiqonNO.UI
 				return;
 			}
 
-			CenterContent();
+			UpdatePosition();
 		}
 		
-		void CenterContent()
+		private void UpdatePosition()
 		{
-			Vector2 targetOffset = GetCenteringOffset.Invoke();
-            
 			Vector3 position = target.transform.position;
-			position.x = -targetOffset.x;
-			position.y = -targetOffset.y;
-			position[Axis] += DragDelta;
+			position[Axis] = -((target.layout.size[Axis] - target.parent.layout.size[Axis]) / 2.0f) + DragDelta;
 			target.transform.position = position;
 		}
 	}

@@ -59,8 +59,8 @@ namespace NiqonNO.UI
             ContentViewport = new VisualElement { name = "toggle-selector-content-viewport", pickingMode = PickingMode.Ignore, };
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePool);
-            
-            var scroller = new NOContentScroller(GetCenteringOffset, JumpNext, JumpPrevious);
+
+            var scroller = new NOContentScroller(JumpNext, JumpPrevious);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.AddManipulator(scroller);
@@ -78,6 +78,9 @@ namespace NiqonNO.UI
             InputContainer.Add(ContentViewport);
             ContentViewport.Add(ContentContainer);
             InputContainer.Add(NextButton);
+
+            ItemsSourceChangedEvent += RefreshTiles;
+            SelectionChangedEvent += RefreshTiles;
         }
 
         private void Rebuild()
@@ -94,7 +97,7 @@ namespace NiqonNO.UI
                 return;
             
             ResizeItemPool();
-            JumpToIndex(SelectedIndex);
+            RefreshTiles();
         }
 
         private void ClearPool()
@@ -108,7 +111,8 @@ namespace NiqonNO.UI
         {
             float containerWidth = ContentViewport.contentRect.width;
 
-            int count = Mathf.FloorToInt(containerWidth / ItemWidth) + 2;
+            int count = Mathf.CeilToInt(containerWidth / ItemWidth);
+            count += 1 + count%2;
             if (ContentContainer.childCount >= count) return;
             
             for (int i = ContentContainer.childCount; i < count; i++)
@@ -120,27 +124,19 @@ namespace NiqonNO.UI
 
         VisualElement CreateItem() => ItemTemplate.Instantiate();
 
-        protected override void OnItemsSourceChanged()
+        private void RefreshTiles()
         {
-            JumpToIndex(SelectedIndex); 
-        }
-        
-        private void JumpToIndex(int index)
-        {
-            if (index < 0) return;
+            if (SelectedIndex < 0) return;
 
-            SelectedIndex = index;
-            var childCount = ContentContainer.childCount;
-            int itemIndex = SelectedIndex - Mathf.FloorToInt(childCount / 2.0f);
+            var pooledTiles = ContentContainer.childCount;
+            int itemIndex = SelectedIndex - Mathf.FloorToInt(pooledTiles / 2.0f);
 
-            for (int i = 0; i < childCount; i++, itemIndex++)
+            for (int i = 0; i < pooledTiles; i++, itemIndex++)
             {
                 BindTileData(ContentContainer[i], GetItem(itemIndex));
-            } 
-
-            CenterContent();
+            }
         }
-
+        
         private void JumpNext()
         {
             int transferIndex = SelectedIndex + Mathf.CeilToInt(ContentContainer.childCount / 2.0f);
@@ -155,24 +151,6 @@ namespace NiqonNO.UI
             BindTileData(ContentContainer[ContentContainer.childCount - 1], GetItem(transferIndex));
             ContentContainer[ContentContainer.childCount - 1].SendToBack();
             SelectedIndex--;
-        }
-
-        void CenterContent()
-        {
-            Vector2 targetOffset = GetCenteringOffset();
-            
-            Vector3 position = ContentContainer.transform.position;
-            position.x = -targetOffset.x;
-            position.y = -targetOffset.y;
-            ContentContainer.transform.position = position;
-        }
-
-        Vector2 GetCenteringOffset()
-        {
-            Vector2 targetOffset = new Vector2((ContentContainer.layout.width - ContentViewport.layout.width) / 2.0f, 0);
-            if (ContentContainer.childCount % 2.0f == 0)
-                targetOffset.x += ItemWidth/2f;
-            return targetOffset;
         }
 
         private void BindTileData(VisualElement visualElement, INOBindingContext dataCollection)

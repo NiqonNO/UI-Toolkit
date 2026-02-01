@@ -10,6 +10,9 @@ namespace NiqonNO.UI
 	{
 		internal static readonly BindingId SourceCollectionProperty = (BindingId) nameof (SourceCollection);
 		internal static readonly BindingId SelectedIndexProperty = (BindingId) nameof (SelectedIndex);
+
+		protected event Action ItemsSourceChangedEvent;
+		protected event Action SelectionChangedEvent;
 		
 		protected List<T> _SourceCollection;
 		[CreateProperty]
@@ -23,8 +26,8 @@ namespace NiqonNO.UI
 				
 				_SourceCollection = value;
 				
-				SelectedIndex = CircularIndex(_SelectedIndex);
-				OnItemsSourceChanged();
+				_SelectedIndex = CircularIndex(_SelectedIndex);
+				ItemsSourceChangedEvent?.Invoke();
 				NotifyPropertyChanged(SourceCollectionProperty);
 			}
 		}
@@ -40,7 +43,7 @@ namespace NiqonNO.UI
 					return;
 
 				_SelectedIndex = CircularIndex(value);
-				OnSelectionChanged();
+				//SelectionChangedEvent?.Invoke();
 				NotifyPropertyChanged(SelectedIndexProperty);
 			}
 		}
@@ -54,9 +57,6 @@ namespace NiqonNO.UI
 
 			return (int)Mathf.Repeat(idx, CollectionLength);
 		}
-		
-		protected virtual void OnItemsSourceChanged() {}
-		protected virtual void OnSelectionChanged() {}
 
 		protected T GetItem(int index)
 		{
