@@ -8,13 +8,10 @@ namespace NiqonNO.UI
 {
 	public abstract class NOCollectionView<T> : BindableElement
 	{
-		internal static readonly BindingId SourceCollectionProperty = (BindingId) nameof (SourceCollection);
-		internal static readonly BindingId SelectedIndexProperty = (BindingId) nameof (SelectedIndex);
-
-		protected event Action ItemsSourceChangedEvent;
-		protected event Action SelectionChangedEvent;
+		private static readonly BindingId SourceCollectionProperty = (BindingId) nameof (SourceCollection);
+		private static readonly BindingId SelectedIndexProperty = (BindingId) nameof (SelectedIndex);
 		
-		protected List<T> _SourceCollection;
+		private List<T> _SourceCollection;
 		[CreateProperty]
 		protected List<T> SourceCollection
 		{
@@ -26,37 +23,37 @@ namespace NiqonNO.UI
 				
 				_SourceCollection = value;
 				
-				_SelectedIndex = CircularIndex(_SelectedIndex);
-				ItemsSourceChangedEvent?.Invoke();
+				SelectedIndex = SelectedIndex;
+				Refresh();
 				NotifyPropertyChanged(SourceCollectionProperty);
 			}
 		}
 
-		protected int _SelectedIndex;
+		private int _SelectedIndex;
 		[CreateProperty]
 		protected int SelectedIndex
 		{
 			get => _SelectedIndex;
-			set
-			{
-				if (_SelectedIndex == value)
-					return;
-
-				_SelectedIndex = CircularIndex(value);
-				//SelectionChangedEvent?.Invoke();
-				NotifyPropertyChanged(SelectedIndexProperty);
-			}
+			private set => SetIndex(value, true);
 		}
-		
+
+		protected void SetIndex(int newIdx, bool refresh = false)
+		{
+			int circular = CircularIndex(newIdx);
+			if (_SelectedIndex == circular)
+				return;
+
+			_SelectedIndex = circular;
+			NotifyPropertyChanged(SelectedIndexProperty);
+			if(refresh)
+				Refresh();
+		}
+
 		public int CollectionLength => _SourceCollection?.Count ?? 0;
 
-		int CircularIndex(int idx)
-		{
-			if (CollectionLength == 0)
-				return -1;
-
-			return (int)Mathf.Repeat(idx, CollectionLength);
-		}
+		protected abstract void Refresh();
+		
+		int CircularIndex(int idx) => (int)Mathf.Repeat(idx, CollectionLength);
 
 		protected T GetItem(int index)
 		{
@@ -64,7 +61,7 @@ namespace NiqonNO.UI
 				return default;
 
 			if (index < 0 || index >= CollectionLength)
-				index = (int)Mathf.Repeat(index, CollectionLength);
+				index = CircularIndex(index);
 
 			return _SourceCollection[index];
 		}
@@ -93,8 +90,6 @@ namespace NiqonNO.UI
 						new("SelectedIndex", "selected-index", null, Array.Empty<string>())
 					});
 			}
-			
-			//public override object CreateInstance() => (object) new NOCollectionView<T>();
 
 			public override void Deserialize(object obj)
 			{

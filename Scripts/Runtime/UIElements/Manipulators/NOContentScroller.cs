@@ -99,11 +99,7 @@ namespace NiqonNO.UI
 		private void UpdateDrag(PointerMoveEvent evt)
 		{
 			DragDelta += evt.deltaPosition[Axis];
-			
-			float offset = Mathf.Abs(DragDelta) + TileSize / 2f;
-			int indexSteps = Mathf.FloorToInt(offset / TileSize) * (int)Mathf.Sign(DragDelta);
-			DragDelta -= TileSize * indexSteps;
-			Scroll(-indexSteps);
+			Scroll();
 		}
 
 		private void OnEndDrag()
@@ -118,29 +114,41 @@ namespace NiqonNO.UI
 		{
 			if (Hold) return;
 			
-			DragDelta += evt.delta.y;
+			DragDelta += evt.delta.y / 6f * TileSize;
+			Scroll();
+		}
+
+		private void Scroll()
+		{
+			float offset = Mathf.Abs(DragDelta) + TileSize / 2f;
+			int indexSteps = Mathf.FloorToInt(offset / TileSize) * (int)Mathf.Sign(-DragDelta);
+			Step(indexSteps);
 		}
 		
-		public void ScrollToNext() => Scroll(1);
-		public void ScrollToPrevious() => Scroll(-1);
-		
-		private void Scroll(int scrollStep)
+		private void Step(int scrollStep)
 		{
 			if (scrollStep > 0)
 			{
+				target[0].BringToFront();
+				DragDelta += TileSize;
 				OnReachNext?.Invoke();
-				Scroll(--scrollStep);
+				Step(--scrollStep);
 				return;
 			}
 			if (scrollStep < 0)
 			{
+				target[target.childCount - 1].SendToBack();
+				DragDelta -= TileSize;
 				OnReachPrevious?.Invoke();
-				Scroll(++scrollStep);
+				Step(++scrollStep);
 				return;
 			}
 
 			UpdatePosition();
 		}
+		
+		public void ScrollToNext() => Step(1);
+		public void ScrollToPrevious() => Step(-1);
 		
 		public void UpdatePosition()
 		{

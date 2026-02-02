@@ -14,8 +14,8 @@ namespace NiqonNO.UI
         private readonly Button PreviousButton;
         private readonly VisualElement ContentContainer;
         private readonly VisualElement ContentViewport;
-        
-        private event Action RefreshGeometryEvent;
+
+        private readonly NOContentScroller ScrollerManipulator;
         
         private ToggleSelectorDirection _Mode;
         [UxmlAttribute]
@@ -34,6 +34,7 @@ namespace NiqonNO.UI
             {
                 if (_ItemTemplate == value)
                     return;
+                
                 _ItemTemplate = value;
                 Rebuild();
             }
@@ -41,10 +42,7 @@ namespace NiqonNO.UI
 
         private float ItemWidth => 160f;
 
-        public NOToggleSelector() : this(string.Empty)
-        {
-        }
-
+        public NOToggleSelector() : this(string.Empty) {  }
         public NOToggleSelector(string label) : base()
         {
             AddToClassList(NOUSS.ItemSelectorClass);
@@ -62,17 +60,16 @@ namespace NiqonNO.UI
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePool);
 
-            var scroller = new NOContentScroller(JumpNext, JumpPrevious);
+            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
-            ContentContainer.AddManipulator(scroller);
-            RefreshGeometryEvent += scroller.UpdatePosition;
+            ContentContainer.AddManipulator(ScrollerManipulator);
             
-            PreviousButton = new Button(scroller.ScrollToPrevious) { name = "toggle-selector-previous",  };
+            PreviousButton = new Button(ScrollerManipulator.ScrollToPrevious) { name = "toggle-selector-previous",  };
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonPreviousClass);
             
-            NextButton = new Button(scroller.ScrollToNext) { name = "toggle-selector-next", };
+            NextButton = new Button(ScrollerManipulator.ScrollToNext) { name = "toggle-selector-next", };
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonNextClass);
 
@@ -81,9 +78,6 @@ namespace NiqonNO.UI
             InputContainer.Add(ContentViewport);
             ContentViewport.Add(ContentContainer);
             InputContainer.Add(NextButton);
-
-            ItemsSourceChangedEvent += RefreshTiles;
-            SelectionChangedEvent += RefreshTiles;
         }
 
         private void Rebuild()
@@ -91,9 +85,12 @@ namespace NiqonNO.UI
             ClearPool();
             UpdatePool();
         }
+        protected override void Refresh()
+        {
+            RefreshTiles();
+        }
 
         private void UpdatePool(GeometryChangedEvent evt) => UpdatePool();
-
         private void UpdatePool()
         {
             if (ItemTemplate == null)
@@ -120,12 +117,10 @@ namespace NiqonNO.UI
             
             for (int i = ContentContainer.childCount; i < count; i++)
             {
-                var item = CreateItem();
+                var item = ItemTemplate.Instantiate();
                 ContentContainer.Add(item);
             }
         }
-
-        VisualElement CreateItem() => ItemTemplate.Instantiate();
 
         private void RefreshTiles()
         {
@@ -138,24 +133,27 @@ namespace NiqonNO.UI
             {
                 BindTileData(ContentContainer[i], GetItem(itemIndex));
             }
-            
-            RefreshGeometryEvent?.Invoke();
+
+            CenterOnSelection();
+        }
+
+        private void CenterOnSelection()
+        {
+            ScrollerManipulator.UpdatePosition();
         }
         
         private void JumpNext()
         {
             int transferIndex = SelectedIndex + Mathf.CeilToInt(ContentContainer.childCount / 2.0f);
-            BindTileData(ContentContainer[0], GetItem(transferIndex));
-            ContentContainer[0].BringToFront();
-            SelectedIndex++;
+            BindTileData(ContentContainer[ContentContainer.childCount - 1], GetItem(transferIndex));
+            SetIndex(SelectedIndex + 1);
         }
 
         private void JumpPrevious()
         {
             int transferIndex = SelectedIndex - Mathf.FloorToInt(ContentContainer.childCount / 2.0f) - 1;
-            BindTileData(ContentContainer[ContentContainer.childCount - 1], GetItem(transferIndex));
-            ContentContainer[ContentContainer.childCount - 1].SendToBack();
-            SelectedIndex--;
+            BindTileData(ContentContainer[0], GetItem(transferIndex));
+            SetIndex(SelectedIndex - 1);
         }
 
         private void BindTileData(VisualElement visualElement, INOBindingContext dataCollection)
