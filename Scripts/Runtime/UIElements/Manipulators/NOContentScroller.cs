@@ -122,29 +122,28 @@ namespace NiqonNO.UI
 		{
 			float offset = Mathf.Abs(DragDelta) + TileSize / 2f;
 			int indexSteps = Mathf.FloorToInt(offset / TileSize) * (int)Mathf.Sign(-DragDelta);
+			DragDelta += TileSize * indexSteps;
 			Step(indexSteps);
 		}
 		
 		private void Step(int scrollStep)
 		{
-			if (scrollStep > 0)
+			switch (scrollStep)
 			{
-				target[0].BringToFront();
-				DragDelta += TileSize;
-				OnReachNext?.Invoke();
-				Step(--scrollStep);
-				return;
+				case > 0:
+					target[0].BringToFront();
+					OnReachNext?.Invoke();
+					Step(--scrollStep);
+					return;
+				case < 0:
+					target[target.childCount - 1].SendToBack();
+					OnReachPrevious?.Invoke();
+					Step(++scrollStep);
+					return;
+				default:
+					UpdatePosition();
+					return;
 			}
-			if (scrollStep < 0)
-			{
-				target[target.childCount - 1].SendToBack();
-				DragDelta -= TileSize;
-				OnReachPrevious?.Invoke();
-				Step(++scrollStep);
-				return;
-			}
-
-			UpdatePosition();
 		}
 		
 		public void ScrollToNext() => Step(1);
