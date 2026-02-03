@@ -8,17 +8,21 @@ namespace NiqonNO.UI
 	{
 		private readonly Action OnReachNext;
 		private readonly Action OnReachPrevious;
-		
-		private IVisualElementScheduledItem Scheduler;
 
 		private ToggleSelectorDirection ScrollDirection = ToggleSelectorDirection.Horizontal;
 		private int Axis => 1 - (int)ScrollDirection;
 		private float TileSize = 160f;
 		
+		private IVisualElementScheduledItem AutoScroll;
+		
 		private bool Hold;
 		private bool Dragging;
 		private int PointerId;
 		private float DragDelta;
+		
+		private float AutoScrollStart;
+		private float AutoScrollTime;
+		private NOEase AutoScrollEase = NOEase.OutElastic;
 
 		public NOContentScroller(Action onReachNext, Action onReachPrevious)
 		{
@@ -63,6 +67,8 @@ namespace NiqonNO.UI
 			PointerId = evt.pointerId;
 			target.CapturePointer(PointerId);
 			evt.StopPropagation();
+
+			StopAutoScroll();
 		}
 
 		private void OnPointerMove(PointerMoveEvent evt)
@@ -105,11 +111,9 @@ namespace NiqonNO.UI
 		private void OnEndDrag()
 		{
 			Dragging = false;
-			
-			DragDelta = 0;
-			UpdatePosition();
+			RunAutoScroll();
 		}
-		
+
 		private void OnScroll(WheelEvent evt)
 		{
 			if (Hold) return;
@@ -125,6 +129,9 @@ namespace NiqonNO.UI
 			DragDelta += TileSize * indexSteps;
 			Step(indexSteps);
 		}
+				
+		public void ScrollToNext() => Step(1);
+		public void ScrollToPrevious() => Step(-1);
 		
 		private void Step(int scrollStep)
 		{
@@ -146,8 +153,33 @@ namespace NiqonNO.UI
 			}
 		}
 		
-		public void ScrollToNext() => Step(1);
-		public void ScrollToPrevious() => Step(-1);
+		private void RunAutoScroll()
+		{
+			AutoScrollStart = DragDelta;
+			AutoScrollTime = 0;
+			if (AutoScroll == null)
+				AutoScroll = target.schedule.Execute(AutoScrollUpdate).Every((int)(Time.fixedDeltaTime * 1000));
+			else
+				AutoScroll.Resume();
+		}
+		private void AutoScrollUpdate(TimerState time)
+		{
+			AutoScrollTime = Mathf.Clamp01(AutoScrollTime + time.deltaTime/1000f);
+			if(Mathf.Approximately(AutoScrollTime, 1))
+			{
+				StopAutoScroll();
+				return;
+			}
+			
+			DragDelta = Mathf.LerpUnclamped(AutoScrollStart, 0,  AutoScrollEase.Ease(AutoScrollTime));
+			UpdatePosition();
+		}
+		private void StopAutoScroll()
+		{
+			DragDelta = 0;
+			UpdatePosition();
+			AutoScroll?.Pause();
+		}
 		
 		public void UpdatePosition()
 		{
