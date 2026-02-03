@@ -19,6 +19,7 @@ namespace NiqonNO.UI
 		private bool Dragging;
 		private int PointerId;
 		private float DragDelta;
+		private float Velocity;
 		
 		private float AutoScrollStart;
 		private float AutoScrollTime;
@@ -117,33 +118,42 @@ namespace NiqonNO.UI
 		private void OnScroll(WheelEvent evt)
 		{
 			if (Hold) return;
-			
-			DragDelta += evt.delta.y / 6f * TileSize;
-			Scroll();
+
+			Velocity += evt.delta.magnitude;
 		}
 
 		private void Scroll()
 		{
 			float offset = Mathf.Abs(DragDelta) + TileSize / 2f;
 			int indexSteps = Mathf.FloorToInt(offset / TileSize) * (int)Mathf.Sign(-DragDelta);
-			DragDelta += TileSize * indexSteps;
 			Step(indexSteps);
 		}
 				
-		public void ScrollToNext() => Step(1);
-		public void ScrollToPrevious() => Step(-1);
-		
+		public void ScrollToNext()
+		{
+			Step(1);
+			RunAutoScroll();
+		}
+
+		public void ScrollToPrevious()
+		{
+			Step(-1);
+			RunAutoScroll();
+		}
+
 		private void Step(int scrollStep)
 		{
 			switch (scrollStep)
 			{
 				case > 0:
 					target[0].BringToFront();
+					DragDelta += TileSize;
 					OnReachNext?.Invoke();
 					Step(--scrollStep);
 					return;
 				case < 0:
 					target[target.childCount - 1].SendToBack();
+					DragDelta -= TileSize;
 					OnReachPrevious?.Invoke();
 					Step(++scrollStep);
 					return;
