@@ -14,9 +14,11 @@ namespace NiqonNO.UI
 		private float TileSize = 160f;
 		
 		private IVisualElementScheduledItem AutoScroll;
+		private IVisualElementScheduledItem ManualScroll;
 		
 		private bool Hold;
 		private bool Dragging;
+		private bool Scrolling;
 		private int PointerId;
 		private float DragDelta;
 		private float Velocity;
@@ -24,6 +26,10 @@ namespace NiqonNO.UI
 		private float AutoScrollStart;
 		private float AutoScrollTime;
 		private NOEase AutoScrollEase = NOEase.OutElastic;
+		
+		private float ManualScrollStart;
+		private float ManualScrollTime;
+		private NOEase ManualScrollEase = NOEase.InCirc;
 
 		public NOContentScroller(Action onReachNext, Action onReachPrevious)
 		{
@@ -119,7 +125,10 @@ namespace NiqonNO.UI
 		{
 			if (Hold) return;
 
-			Velocity += evt.delta.magnitude;
+			ManualScrollStart = Velocity + evt.delta.y * 5;
+			ManualScrollTime = 0;
+			if(!Scrolling)
+				RunManualScroll();
 		}
 
 		private void Scroll()
@@ -162,6 +171,37 @@ namespace NiqonNO.UI
 					return;
 			}
 		}
+
+		private void RunManualScroll()
+		{
+			if (ManualScroll == null)
+				ManualScroll = target.schedule.Execute(ManualScrollUpdate).Every((int)(Time.fixedDeltaTime * 1000));
+			else
+				ManualScroll.Resume();
+			
+			AutoScroll?.Pause();
+			Scrolling = true;
+		}
+		private void ManualScrollUpdate(TimerState time)
+		{
+			ManualScrollTime = Mathf.Clamp01(ManualScrollTime + time.deltaTime/200f);
+			Velocity = Mathf.Lerp(ManualScrollStart, 0,  ManualScrollEase.Ease(ManualScrollTime));
+			DragDelta += Velocity;
+			if(Mathf.Approximately(Velocity, 0))
+			{
+				StopManualScroll();
+				return;
+			}
+
+			Scroll();
+		}
+		private void StopManualScroll()
+		{
+			Scrolling = false;
+			Velocity = 0;
+			ManualScroll?.Pause();
+			RunAutoScroll();
+		}
 		
 		private void RunAutoScroll()
 		{
@@ -187,8 +227,8 @@ namespace NiqonNO.UI
 		private void StopAutoScroll()
 		{
 			DragDelta = 0;
-			UpdatePosition();
 			AutoScroll?.Pause();
+			UpdatePosition();
 		}
 		
 		public void UpdatePosition()
