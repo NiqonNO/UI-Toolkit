@@ -12,24 +12,14 @@ namespace NiqonNO.UI
 		private ToggleSelectorDirection ScrollDirection = ToggleSelectorDirection.Horizontal;
 		private int Axis => 1 - (int)ScrollDirection;
 		private float TileSize = 160f;
-		
-		private IVisualElementScheduledItem AutoScroll;
-		private IVisualElementScheduledItem ManualScroll;
+
+		private ScrollTween AutoScroll;
+		private ScrollTween ManualScroll;
 		
 		private bool Hold;
 		private bool Dragging;
-		private bool Scrolling;
 		private int PointerId;
 		private float DragDelta;
-		private float Velocity;
-		
-		private float AutoScrollStart;
-		private float AutoScrollTime;
-		private NOEase AutoScrollEase = NOEase.OutElastic;
-		
-		private float ManualScrollStart;
-		private float ManualScrollTime;
-		private NOEase ManualScrollEase = NOEase.InCirc;
 
 		public NOContentScroller(Action onReachNext, Action onReachPrevious)
 		{
@@ -50,6 +40,9 @@ namespace NiqonNO.UI
 			target.RegisterCallback<PointerUpEvent>(OnPointerUp);
 			
 			target.RegisterCallback<WheelEvent>(OnScroll);
+
+			AutoScroll = new ScrollTween(target, NOEase.OutElastic, 1.0f, OnAutoScroll);
+			ManualScroll = new ScrollTween(target, NOEase.InCirc, 0.3f, OnManualScroll, RunAutoScroll);
 		}
 		protected override void UnregisterCallbacksFromTarget()
 		{
@@ -74,8 +67,8 @@ namespace NiqonNO.UI
 			PointerId = evt.pointerId;
 			target.CapturePointer(PointerId);
 			evt.StopPropagation();
-
-			StopAutoScroll();
+			
+			AutoScroll.Stop();
 		}
 
 		private void OnPointerMove(PointerMoveEvent evt)
@@ -124,11 +117,7 @@ namespace NiqonNO.UI
 		private void OnScroll(WheelEvent evt)
 		{
 			if (Hold) return;
-
-			ManualScrollStart = Velocity + evt.delta.y * 5;
-			ManualScrollTime = 0;
-			if(!Scrolling)
-				RunManualScroll();
+			RunManualScroll(evt.delta.y * 5);
 		}
 
 		private void Scroll()
@@ -171,63 +160,24 @@ namespace NiqonNO.UI
 					return;
 			}
 		}
-
-		private void RunManualScroll()
+		
+		private void RunManualScroll(float velocity)
 		{
-			if (ManualScroll == null)
-				ManualScroll = target.schedule.Execute(ManualScrollUpdate).Every((int)(Time.fixedDeltaTime * 1000));
-			else
-				ManualScroll.Resume();
-			
-			AutoScroll?.Pause();
-			Scrolling = true;
+			AutoScroll.Stop();
+			ManualScroll.Run(velocity);
 		}
-		private void ManualScrollUpdate(TimerState time)
+		private void OnManualScroll(float delta)
 		{
-			ManualScrollTime = Mathf.Clamp01(ManualScrollTime + time.deltaTime/200f);
-			Velocity = Mathf.Lerp(ManualScrollStart, 0,  ManualScrollEase.Ease(ManualScrollTime));
-			DragDelta += Velocity;
-			if(Mathf.Approximately(Velocity, 0))
-			{
-				StopManualScroll();
-				return;
-			}
-
+			DragDelta += delta;
 			Scroll();
 		}
-		private void StopManualScroll()
-		{
-			Scrolling = false;
-			Velocity = 0;
-			ManualScroll?.Pause();
-			RunAutoScroll();
-		}
-		
 		private void RunAutoScroll()
 		{
-			AutoScrollStart = DragDelta;
-			AutoScrollTime = 0;
-			if (AutoScroll == null)
-				AutoScroll = target.schedule.Execute(AutoScrollUpdate).Every((int)(Time.fixedDeltaTime * 1000));
-			else
-				AutoScroll.Resume();
+			AutoScroll.Run(DragDelta);
 		}
-		private void AutoScrollUpdate(TimerState time)
+		private void OnAutoScroll(float delta)
 		{
-			AutoScrollTime = Mathf.Clamp01(AutoScrollTime + time.deltaTime/1000f);
-			if(Mathf.Approximately(AutoScrollTime, 1))
-			{
-				StopAutoScroll();
-				return;
-			}
-			
-			DragDelta = Mathf.LerpUnclamped(AutoScrollStart, 0,  AutoScrollEase.Ease(AutoScrollTime));
-			UpdatePosition();
-		}
-		private void StopAutoScroll()
-		{
-			DragDelta = 0;
-			AutoScroll?.Pause();
+			DragDelta = delta;
 			UpdatePosition();
 		}
 		
@@ -236,6 +186,58 @@ namespace NiqonNO.UI
 			Vector3 position = target.transform.position;
 			position[Axis] = -((target.layout.size[Axis] - target.parent.layout.size[Axis]) / 2.0f) + DragDelta;
 			target.transform.position = position;
+		}
+
+		private class ScrollTween
+		{
+			private static int UpdateDeltaTime = (int)(Time.fixedDeltaTime * 1000);
+			
+			private readonly Action<float> OnTick;
+			private readonly Action OnComplete;  
+			
+			private readonly VisualElement Target;
+			private readonly float Duration;
+			private readonly NOEase Ease;
+			
+			private IVisualElementScheduledItem Scheduler;
+				
+			private float Start = 0;
+			private float Progress = 0;
+
+			public ScrollTween(VisualElement target, NOEase ease, float duration, Action<float> onTick, Action onComplete = null)
+			{
+				Target = target;
+				Ease = ease;
+				Duration = duration * 1000;
+				OnTick = onTick;
+				OnComplete = onComplete;
+			}
+			
+			public void Run(float startValue)
+			{
+				Start = startValue;
+				Progress = 0f;
+				
+				if (Scheduler == null)
+					Scheduler = Target.schedule.Execute(Update).Every(UpdateDeltaTime);
+				else
+					Scheduler.Resume();
+			}
+
+			void Update(TimerState t)
+			{
+				Progress = Mathf.Clamp01(Progress + t.deltaTime / Duration);
+				float value = Mathf.LerpUnclamped(Start, 0f, Ease.Ease(Progress));
+				OnTick?.Invoke(value);
+
+				if (Mathf.Approximately(Progress, 1f)) Stop();
+			}
+
+			public void Stop()
+			{
+				Scheduler?.Pause();
+				OnComplete?.Invoke();
+			}
 		}
 	}
 }
