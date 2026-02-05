@@ -1,4 +1,3 @@
-using System;
 using NiqonNO.UI.MVVM;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,34 +15,33 @@ namespace NiqonNO.UI
         private readonly VisualElement ContentViewport;
 
         private readonly NOContentScroller ScrollerManipulator;
-        
-        private ToggleSelectorDirection _Mode;
-        [UxmlAttribute]
-        public ToggleSelectorDirection Mode
-        {
-            get => _Mode;
-            set => SetScrollViewMode(value);
-        }
-        
-        private VisualTreeAsset _ItemTemplate;
-        [UxmlAttribute]
-        public VisualTreeAsset ItemTemplate
-        {
-            get => _ItemTemplate;
-            set
-            {
-                if (_ItemTemplate == value)
-                    return;
-                
-                _ItemTemplate = value;
-                Rebuild();
-            }
-        }
 
-        private float ItemWidth => 160f;
+        [UxmlAttribute]
+        private ScrollDirection Direction { get => _Direction; set { _Direction = value; ScrollerManipulator?.SetDirection(_Direction); UpdateScrollDirection(); } }
+        private ScrollDirection _Direction;
+        
+        [UxmlAttribute]
+        private NOEase AutoScrollEase { get => _AutoScrollEase; set { _AutoScrollEase = value; ScrollerManipulator?.SetCenteringEase(_AutoScrollEase); }  }
+        private NOEase _AutoScrollEase;
+        
+        [UxmlAttribute] 
+        private float AutoScrollDuration { get => _AutoScrollDuration; set { _AutoScrollDuration = value; ScrollerManipulator?.SetCenteringDuration(_AutoScrollDuration); }  }
+        private float _AutoScrollDuration;
+        
+        [UxmlAttribute]
+        private VisualTreeAsset ItemTemplate { get => _ItemTemplate; set { _ItemTemplate = value; Rebuild(); } }
+        private VisualTreeAsset _ItemTemplate;
+
+        private Vector2 ItemDimensions = new Vector2(160, 160);
+        
+        private float ItemSize => ItemDimensions[Axis];
+        private int Axis => 1 - (int)Direction;
+        
 
         public NOToggleSelector() : this(string.Empty) {  }
-        public NOToggleSelector(string label) : base()
+        public NOToggleSelector(string label) : this(label, new Vector2(160, 160), ScrollDirection.Vertical) {  }
+        public NOToggleSelector(string label, Vector2 itemDimensions, ScrollDirection scrollDirection,
+            NOEase centeringEase = NOEase.Linear, float centeringDuration = 0.3f)
         {
             AddToClassList(NOUSS.ItemSelectorClass);
             if (label != null)
@@ -60,7 +58,7 @@ namespace NiqonNO.UI
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePool);
 
-            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious);
+            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, itemDimensions, scrollDirection, centeringEase, centeringDuration);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.AddManipulator(ScrollerManipulator);
@@ -72,14 +70,19 @@ namespace NiqonNO.UI
             NextButton = new Button(ScrollerManipulator.ScrollToNext) { name = "toggle-selector-next", };
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonNextClass);
-
             
             InputContainer.Add(PreviousButton);
             InputContainer.Add(ContentViewport);
             ContentViewport.Add(ContentContainer);
             InputContainer.Add(NextButton);
-        }
 
+            ItemDimensions = itemDimensions;
+            _Direction = scrollDirection;
+            _AutoScrollEase = centeringEase;
+            _AutoScrollDuration = centeringDuration;
+            UpdateScrollDirection();
+        }
+        
         private void Rebuild()
         {
             ClearPool();
@@ -95,7 +98,7 @@ namespace NiqonNO.UI
         {
             if (ItemTemplate == null)
                 return;
-            
+
             ResizeItemPool();
             RefreshTiles();
         }
@@ -107,18 +110,31 @@ namespace NiqonNO.UI
                 ContentContainer.RemoveAt(0);
             }
         }
+
         private void ResizeItemPool()
         {
-            float containerWidth = ContentViewport.contentRect.width;
-
-            int count = Mathf.CeilToInt(containerWidth / ItemWidth);
+            int count = Mathf.Max(0, Mathf.CeilToInt(ContentViewport.contentRect.size[Axis] / ItemSize));
             count += 1 + count%2;
-            if (ContentContainer.childCount >= count) return;
             
-            for (int i = ContentContainer.childCount; i < count; i++)
+            if (ContentContainer.childCount == count) return;
+            if (ContentContainer.childCount < count) SpawnItems();
+            else if (ContentContainer.childCount > count) RemoveItems();
+            return;
+           
+            void SpawnItems()
             {
-                var item = ItemTemplate.Instantiate();
-                ContentContainer.Add(item);
+                for (int i = ContentContainer.childCount; i < count; i++)
+                {
+                    var item = ItemTemplate.Instantiate();
+                    ContentContainer.Add(item);
+                }
+            }
+            void RemoveItems()
+            {
+                for (int i = ContentContainer.childCount; i > count; i--)
+                {
+                    ContentContainer.RemoveAt(0);
+                }
             }
         }
 
@@ -161,28 +177,29 @@ namespace NiqonNO.UI
             dataCollection?.Bind(visualElement);
         }
  
-        private void SetScrollViewMode(ToggleSelectorDirection mode)
+        private void UpdateScrollDirection()
         {
-            _Mode = mode;
             InputContainer.RemoveFromClassList(NOUSS.ToggleSelectorInputContainerVerticalClass);
             InputContainer.RemoveFromClassList(NOUSS.ToggleSelectorInputContainerHorizontalClass);
             ContentViewport.RemoveFromClassList(NOUSS.ToggleSelectorViewportVerticalClass);
             ContentViewport.RemoveFromClassList(NOUSS.ToggleSelectorViewportHorizontalClass);
             ContentContainer.RemoveFromClassList(NOUSS.ToggleSelectorContentContainerVerticalClass);
             ContentContainer.RemoveFromClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass);
-            switch (mode)
+            switch (Direction)
             {
-                case ToggleSelectorDirection.Vertical:
+                case ScrollDirection.Vertical:
                     InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerVerticalClass);
                     ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportVerticalClass);
                     ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerVerticalClass);
                     break;
-                case ToggleSelectorDirection.Horizontal:
+                case ScrollDirection.Horizontal:
                     InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerHorizontalClass);
                     ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportHorizontalClass);
                     ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass);
                     break;
             }
+
+            CenterOnSelection();
         }
     }
 }

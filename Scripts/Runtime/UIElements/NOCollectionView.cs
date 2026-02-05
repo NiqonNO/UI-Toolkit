@@ -53,11 +53,11 @@ namespace NiqonNO.UI
 
 		protected abstract void Refresh();
 		
-		int CircularIndex(int idx) => (int)Mathf.Repeat(idx, CollectionLength);
+		int CircularIndex(int idx) => CollectionLength == 0 ? 0 : (int)Mathf.Repeat(idx, CollectionLength);
 
 		protected T GetItem(int index)
 		{
-			if (_SourceCollection == null)
+			if (CollectionLength == 0)
 				return default;
 
 			if (index < 0 || index >= CollectionLength)

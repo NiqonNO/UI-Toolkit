@@ -1,6 +1,6 @@
 namespace NiqonNO.UI
 {
-	public enum ToggleSelectorDirection
+	public enum ScrollDirection
 	{
 		Vertical,
 		Horizontal,
