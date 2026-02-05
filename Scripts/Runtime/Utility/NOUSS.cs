@@ -9,6 +9,12 @@
 		private const string ViewportSuffix = "__viewport";
 		private const string HandleSuffix = "__handle";
 		private const string DragAreaSuffix = "__drag-area";
+		private const string TileSuffix = "__tile";
+		
+		private const string NextModifier = "--next";
+		private const string PreviousModifier = "--previous";
+		private const string VerticalModifier = "--vertical";
+		private const string HorizontalModifier = "--horizontal";
 		
 		public const string TernaryClass = "ternary-slider";
 		public static readonly string TernaryLabelClass = $"{TernaryClass}{LabelSuffix}";
@@ -19,16 +25,17 @@
 		public const string ItemSelectorClass = "toggle-selector";
 		public static readonly string ToggleSelectorLabelClass = $"{ItemSelectorClass}{LabelSuffix}";
 		public static readonly string ToggleSelectorInputContainerClass = $"{ItemSelectorClass}{InputSuffix}";
-		public static readonly string ToggleSelectorInputContainerVerticalClass = $"{ToggleSelectorInputContainerClass}--vertical";
-		public static readonly string ToggleSelectorInputContainerHorizontalClass = $"{ToggleSelectorInputContainerClass}--horizontal";
+		public static readonly string ToggleSelectorInputContainerVerticalClass = $"{ToggleSelectorInputContainerClass}{VerticalModifier}";
+		public static readonly string ToggleSelectorInputContainerHorizontalClass = $"{ToggleSelectorInputContainerClass}{HorizontalModifier}";
 		public static readonly string ToggleSelectorButtonClass = $"{ItemSelectorClass}{ButtonSuffix}";
-		public static readonly string ToggleSelectorButtonPreviousClass = $"{ToggleSelectorButtonClass}-previous";
-		public static readonly string ToggleSelectorButtonNextClass = $"{ToggleSelectorButtonClass}-next";
+		public static readonly string ToggleSelectorButtonPreviousClass = $"{ToggleSelectorButtonClass}{PreviousModifier}";
+		public static readonly string ToggleSelectorButtonNextClass = $"{ToggleSelectorButtonClass}{NextModifier}";
 		public static readonly string ToggleSelectorViewportClass = $"{ItemSelectorClass}{ViewportSuffix}";
-		public static readonly string ToggleSelectorViewportVerticalClass = $"{ToggleSelectorViewportClass}--vertical";
-		public static readonly string ToggleSelectorViewportHorizontalClass = $"{ToggleSelectorViewportClass}--horizontal";
+		public static readonly string ToggleSelectorViewportVerticalClass = $"{ToggleSelectorViewportClass}{VerticalModifier}";
+		public static readonly string ToggleSelectorViewportHorizontalClass = $"{ToggleSelectorViewportClass}{HorizontalModifier}";
 		public static readonly string ToggleSelectorContentContainerClass = $"{ItemSelectorClass}{ContentSuffix}";
-		public static readonly string ToggleSelectorContentContainerVerticalClass = $"{ToggleSelectorContentContainerClass}--vertical";
-		public static readonly string ToggleSelectorContentContainerHorizontalClass = $"{ToggleSelectorContentContainerClass}--horizontal";
+		public static readonly string ToggleSelectorContentContainerVerticalClass = $"{ToggleSelectorContentContainerClass}{VerticalModifier}";
+		public static readonly string ToggleSelectorContentContainerHorizontalClass = $"{ToggleSelectorContentContainerClass}{HorizontalModifier}";
+		public static readonly string ToggleSelectorTile = $"{ItemSelectorClass}{TileSuffix}";
 	}
 }
