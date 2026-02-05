@@ -11,8 +11,7 @@ namespace NiqonNO.UI
 		
 		private int Direction;
 		private int Axis;
-		private float TileSize => ItemDimensions[Axis];
-		private Vector2 ItemDimensions;
+		private float TileSize;
 
 		private ScrollTween AutoScroll;
 		private ScrollTween ManualScroll;
@@ -23,7 +22,7 @@ namespace NiqonNO.UI
 		private float DragDelta;
 
 		public NOContentScroller(Action onReachNext, Action onReachPrevious, 
-			Vector2 itemDimensions, ScrollDirection scrollDirection,
+			float tileSize, ScrollDirection scrollDirection,
 			NOEase centeringEase = NOEase.Linear, float centeringDuration = 0.3f, 
 			NOEase decelerationEase = NOEase.InCirc, float decelerationDuration = 0.3f)
 		{
@@ -35,15 +34,19 @@ namespace NiqonNO.UI
 
 			OnReachNext = onReachNext;
 			OnReachPrevious = onReachPrevious;
-
-			SetItemDimensions(itemDimensions);
+			
+			SetTileSize(tileSize);
 			SetDirection(scrollDirection);
 			
 			AutoScroll = new ScrollTween().SetEase(centeringEase).SetDuration(centeringDuration).OnTick(OnAutoScroll);
 			ManualScroll = new ScrollTween().SetEase(decelerationEase).SetDuration(decelerationDuration).OnTick(OnManualScroll).OnComplete(RunAutoScroll);
 		}
 		
-		public void SetItemDimensions(Vector2 dimensions) => ItemDimensions = dimensions;
+		public void SetTileSize(float size)
+		{
+			TileSize = size;
+		}
+
 		public void SetDirection(ScrollDirection direction) { Direction = (int)direction; Axis = 1 - Direction; }
 		public void SetCenteringEase(NOEase ease) => AutoScroll.SetEase(ease);
 		public void SetCenteringDuration(float duration) => AutoScroll.SetDuration(duration);

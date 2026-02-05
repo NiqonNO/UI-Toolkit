@@ -1,3 +1,4 @@
+using System;
 using NiqonNO.UI.MVVM;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,6 +21,10 @@ namespace NiqonNO.UI
         private ScrollDirection Direction { get => _Direction; set { _Direction = value; ScrollerManipulator?.SetDirection(_Direction); UpdateScrollDirection(); } }
         private ScrollDirection _Direction;
         
+        [UxmlAttribute, Range(0.01f, 10.0f)]
+        private float TileAspectRatio { get => _TileAspectRatio; set { _TileAspectRatio = value; ResizeTiles(); } }
+        private float _TileAspectRatio;
+        
         [UxmlAttribute]
         private NOEase AutoScrollEase { get => _AutoScrollEase; set { _AutoScrollEase = value; ScrollerManipulator?.SetCenteringEase(_AutoScrollEase); }  }
         private NOEase _AutoScrollEase;
@@ -32,17 +37,23 @@ namespace NiqonNO.UI
         private VisualTreeAsset ItemTemplate { get => _ItemTemplate; set { _ItemTemplate = value; Rebuild(); } }
         private VisualTreeAsset _ItemTemplate;
 
-        private Vector2 ItemDimensions = new Vector2(160, 160);
-        
-        private float ItemSize => ItemDimensions[Axis];
-        private int Axis => 1 - (int)Direction;
-        
+        private float ViewportMainSize => Direction == ScrollDirection.Vertical
+            ? ContentViewport.resolvedStyle.height : ContentViewport.resolvedStyle.width;
+        private float ViewportCrossSize => Direction == ScrollDirection.Vertical
+            ? ContentViewport.resolvedStyle.width : ContentViewport.resolvedStyle.height;
+        private float TilePixelSize => ViewportCrossSize * TileAspectRatio;
 
         public NOToggleSelector() : this(string.Empty) {  }
-        public NOToggleSelector(string label) : this(label, new Vector2(160, 160), ScrollDirection.Vertical) {  }
-        public NOToggleSelector(string label, Vector2 itemDimensions, ScrollDirection scrollDirection,
+
+        public NOToggleSelector(string label, 
+            float tileAspectRatio = 1.0f, ScrollDirection scrollDirection = ScrollDirection.Vertical,
             NOEase centeringEase = NOEase.Linear, float centeringDuration = 0.3f)
         {
+            _TileAspectRatio = tileAspectRatio;
+            _Direction = scrollDirection;
+            _AutoScrollEase = centeringEase;
+            _AutoScrollDuration = centeringDuration;
+            
             AddToClassList(NOUSS.ItemSelectorClass);
             if (label != null)
             {
@@ -58,7 +69,7 @@ namespace NiqonNO.UI
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePool);
 
-            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, itemDimensions, scrollDirection, centeringEase, centeringDuration);
+            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, TilePixelSize, scrollDirection, centeringEase, centeringDuration);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.AddManipulator(ScrollerManipulator);
@@ -75,11 +86,7 @@ namespace NiqonNO.UI
             InputContainer.Add(ContentViewport);
             ContentViewport.Add(ContentContainer);
             InputContainer.Add(NextButton);
-
-            ItemDimensions = itemDimensions;
-            _Direction = scrollDirection;
-            _AutoScrollEase = centeringEase;
-            _AutoScrollDuration = centeringDuration;
+            
             UpdateScrollDirection();
         }
         
@@ -113,29 +120,49 @@ namespace NiqonNO.UI
 
         private void ResizeItemPool()
         {
-            int count = Mathf.Max(0, Mathf.CeilToInt(ContentViewport.contentRect.size[Axis] / ItemSize));
+            int count = Mathf.Max(0, Mathf.CeilToInt(ViewportMainSize / TilePixelSize));
             count += 1 + count%2;
-            
-            if (ContentContainer.childCount == count) return;
-            if (ContentContainer.childCount < count) SpawnItems();
-            else if (ContentContainer.childCount > count) RemoveItems();
+
+            if (ContentContainer.childCount < count) SpawnTile();
+            else if (ContentContainer.childCount > count) RemoveTiles();
+            ResizeTiles();
             return;
            
-            void SpawnItems()
+            void SpawnTile()
             {
                 for (int i = ContentContainer.childCount; i < count; i++)
                 {
                     var item = ItemTemplate.Instantiate();
+                    item.AddToClassList(NOUSS.ToggleSelectorTile);
                     ContentContainer.Add(item);
                 }
             }
-            void RemoveItems()
+            void RemoveTiles()
             {
                 for (int i = ContentContainer.childCount; i > count; i--)
                 {
                     ContentContainer.RemoveAt(0);
                 }
             }
+        }
+
+        private void ResizeTiles()
+        {
+            for (int i = 0; i < ContentContainer.childCount; i++)
+            {
+                switch (Direction)
+                {
+                    case ScrollDirection.Vertical:
+                        ContentContainer[i].style.width = Length.Percent(100);
+                        ContentContainer[i].style.height = TilePixelSize;
+                        break;
+                    case ScrollDirection.Horizontal:
+                        ContentContainer[i].style.width = TilePixelSize;
+                        ContentContainer[i].style.height = Length.Percent(100);
+                        break;
+                }
+            }
+            ScrollerManipulator?.SetTileSize(TilePixelSize);
         }
 
         private void RefreshTiles()
@@ -199,6 +226,7 @@ namespace NiqonNO.UI
                     break;
             }
 
+            ResizeTiles();
             CenterOnSelection();
         }
     }
