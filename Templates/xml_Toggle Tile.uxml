@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement data-source-type="NiqonNO.Samples.NOSampleModel, Assembly-CSharp" style="border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; border-left-color: rgb(255, 255, 0); border-right-color: rgb(255, 255, 0); border-top-color: rgb(255, 255, 0); border-bottom-color: rgb(255, 255, 0); border-top-left-radius: 50%; border-top-right-radius: 50%; border-bottom-right-radius: 50%; border-bottom-left-radius: 50%; margin-right: 5px; margin-left: 5px; margin-bottom: 5px; margin-top: 5px; flex-grow: 1;">
+        <ui:VisualElement name="Selection-Highlight" style="flex-grow: 1; border-top-left-radius: 50%; border-top-right-radius: 50%; border-bottom-right-radius: 50%; border-bottom-left-radius: 50%; display: flex;">
+            <ui:Label style="-unity-text-align: middle-center; flex-grow: 1;">
+                <Bindings>
+                    <ui:DataBinding property="text" data-source-path="_DisplayName_k__BackingField" binding-mode="ToTarget" />
+                </Bindings>
+            </ui:Label>
+            <Bindings>
+                <ui:DataBinding property="style.backgroundColor" data-source-path="_DisplayColor_k__BackingField" binding-mode="ToTarget" />
+            </Bindings>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

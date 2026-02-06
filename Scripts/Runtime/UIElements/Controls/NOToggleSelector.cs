@@ -95,11 +95,6 @@ namespace NiqonNO.UI
             ClearPool();
             UpdatePool();
         }
-        protected override void Refresh()
-        {
-            RefreshTiles();
-        }
-
         private void UpdatePool(GeometryChangedEvent evt) => UpdatePool();
         private void UpdatePool()
         {
@@ -117,7 +112,6 @@ namespace NiqonNO.UI
                 ContentContainer.RemoveAt(0);
             }
         }
-
         private void ResizeItemPool()
         {
             int count = Mathf.Max(0, Mathf.CeilToInt(ViewportMainSize / TilePixelSize));
@@ -145,9 +139,10 @@ namespace NiqonNO.UI
                 }
             }
         }
-
         private void ResizeTiles()
         {
+            if (ContentContainer.childCount == 0) return;
+            
             for (int i = 0; i < ContentContainer.childCount; i++)
             {
                 switch (Direction)
@@ -163,12 +158,14 @@ namespace NiqonNO.UI
                 }
             }
             ScrollerManipulator?.SetTileSize(TilePixelSize);
+            CenterOnSelection();
         }
 
+        protected override void Refresh() => RefreshTiles();
         private void RefreshTiles()
         {
-            if (SelectedIndex < 0) return;
-
+            if (ContentContainer.childCount == 0) return;
+            
             var pooledTiles = ContentContainer.childCount;
             int itemIndex = SelectedIndex - Mathf.FloorToInt(pooledTiles / 2.0f);
 
@@ -180,10 +177,7 @@ namespace NiqonNO.UI
             CenterOnSelection();
         }
 
-        private void CenterOnSelection()
-        {
-            ScrollerManipulator.UpdatePosition();
-        }
+        private void CenterOnSelection() => ScrollerManipulator?.UpdatePosition();
         
         private void JumpNext()
         {
@@ -227,7 +221,6 @@ namespace NiqonNO.UI
             }
 
             ResizeTiles();
-            CenterOnSelection();
         }
     }
 }

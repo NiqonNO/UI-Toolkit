@@ -3,6 +3,7 @@
 	public static class NOUSS
 	{
 		private const string LabelSuffix = "__label";
+		private const string BackgroundSuffix = "__background";
 		private const string ButtonSuffix = "__button";
 		private const string InputSuffix = "__input-container";
 		private const string ContentSuffix = "__content-container";
@@ -19,8 +20,9 @@
 		public const string TernaryClass = "ternary-slider";
 		public static readonly string TernaryLabelClass = $"{TernaryClass}{LabelSuffix}";
 		public static readonly string TernaryInputContainerClass = $"{TernaryClass}{InputSuffix}";
-		public static readonly string TernaryHandleClass = $"{TernaryClass}{HandleSuffix}";
+		public static readonly string TernaryBackgroundClass = $"{TernaryClass}{BackgroundSuffix}";
 		public static readonly string TernaryDragAreaClass = $"{TernaryClass}{DragAreaSuffix}";
+		public static readonly string TernaryHandleClass = $"{TernaryClass}{HandleSuffix}";
 		
 		public const string ItemSelectorClass = "toggle-selector";
 		public static readonly string ToggleSelectorLabelClass = $"{ItemSelectorClass}{LabelSuffix}";

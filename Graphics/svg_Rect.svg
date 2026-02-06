@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="325.60001"
+   height="325.60001"
+   viewBox="0 0 325.60001 325.60001"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter454"
+       x="-0.1359375"
+       y="-0.1359375"
+       width="1.271875"
+       height="1.271875">
+      <feFlood
+         result="flood"
+         in="SourceGraphic"
+         flood-opacity="0.498039"
+         flood-color="rgb(0,0,0)"
+         id="feFlood453" />
+      <feGaussianBlur
+         result="blur"
+         in="SourceGraphic"
+         stdDeviation="6.000000"
+         id="feGaussianBlur453" />
+      <feOffset
+         result="offset"
+         in="blur"
+         dx="6.000000"
+         dy="6.000000"
+         id="feOffset453" />
+      <feComposite
+         result="comp1"
+         operator="out"
+         in="flood"
+         in2="offset"
+         id="feComposite453" />
+      <feComposite
+         result="fbSourceGraphic"
+         operator="atop"
+         in="comp1"
+         in2="SourceGraphic"
+         id="feComposite454" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix458" />
+      <feFlood
+         id="feFlood458"
+         result="flood"
+         in="fbSourceGraphic"
+         flood-opacity="0.498039"
+         flood-color="rgb(255,255,255)" />
+      <feGaussianBlur
+         id="feGaussianBlur458"
+         result="blur"
+         in="fbSourceGraphic"
+         stdDeviation="6.000000" />
+      <feOffset
+         id="feOffset458"
+         result="offset"
+         in="blur"
+         dx="-6.000000"
+         dy="-6.000000" />
+      <feComposite
+         id="feComposite458"
+         result="comp1"
+         operator="out"
+         in="flood"
+         in2="offset" />
+      <feComposite
+         id="feComposite459"
+         result="comp2"
+         operator="atop"
+         in="comp1"
+         in2="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(34.799999,34.799999)">
+    <rect
+       style="fill:#808080;fill-opacity:1;stroke-width:3.7e-07;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dashoffset:10.4;filter:url(#filter454)"
+       id="rect1"
+       width="256"
+       height="256"
+       x="0"
+       y="0"
+       rx="64" />
+  </g>
+</svg>
