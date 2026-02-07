@@ -1,4 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/CoreSamples/UI/Toolkit/uss_Ternary.uss?fileID=7433441132597879392&amp;guid=9ee71f9a7ee026447ae62c517898a477&amp;type=3#uss_Ternary" />
-    <NiqonNO.UI.NOTernarySlider high-value="100" round-to-int="false" value="48.5,34,48.5" style="overflow: visible; flex-grow: 1;" />
-</ui:UXML>

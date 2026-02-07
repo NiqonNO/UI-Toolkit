@@ -1,4 +1,7 @@
-﻿namespace NiqonNO.UI
+﻿using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace NiqonNO.UI
 {
 	public static class NOUSS
 	{
@@ -17,6 +20,7 @@
 		private const string VerticalModifier = "--vertical";
 		private const string HorizontalModifier = "--horizontal";
 		
+		public const string TernaryStylePath = "uss_Ternary";
 		public const string TernaryClass = "ternary-slider";
 		public static readonly string TernaryLabelClass = $"{TernaryClass}{LabelSuffix}";
 		public static readonly string TernaryInputContainerClass = $"{TernaryClass}{InputSuffix}";
@@ -24,6 +28,7 @@
 		public static readonly string TernaryDragAreaClass = $"{TernaryClass}{DragAreaSuffix}";
 		public static readonly string TernaryHandleClass = $"{TernaryClass}{HandleSuffix}";
 		
+		public const string ToggleSelectorStylePath = "uss_Item Selector";
 		public const string ItemSelectorClass = "toggle-selector";
 		public static readonly string ToggleSelectorLabelClass = $"{ItemSelectorClass}{LabelSuffix}";
 		public static readonly string ToggleSelectorInputContainerClass = $"{ItemSelectorClass}{InputSuffix}";
@@ -39,5 +44,7 @@
 		public static readonly string ToggleSelectorContentContainerVerticalClass = $"{ToggleSelectorContentContainerClass}{VerticalModifier}";
 		public static readonly string ToggleSelectorContentContainerHorizontalClass = $"{ToggleSelectorContentContainerClass}{HorizontalModifier}";
 		public static readonly string ToggleSelectorTile = $"{ItemSelectorClass}{TileSuffix}";
+		
+		public static StyleSheet GetStyleSheet(string path) => Resources.Load<StyleSheet>(path);
 	}
 }

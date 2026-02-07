@@ -49,6 +49,8 @@ namespace NiqonNO.UI
             float tileAspectRatio = 1.0f, ScrollDirection scrollDirection = ScrollDirection.Vertical,
             NOEase centeringEase = NOEase.Linear, float centeringDuration = 0.3f)
         {
+            styleSheets.Add(NOUSS.GetStyleSheet(NOUSS.ToggleSelectorStylePath));
+            
             _TileAspectRatio = tileAspectRatio;
             _Direction = scrollDirection;
             _AutoScrollEase = centeringEase;

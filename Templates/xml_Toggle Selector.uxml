@@ -1,4 +1,0 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/CoreSamples/UI/Toolkit/uss_Item%20Selector.uss?fileID=7433441132597879392&amp;guid=8ebc8e8e12b9e05459bbef648bdefa44&amp;type=3#uss_Item Selector" />
-    <NiqonNO.UI.NOToggleSelector mode="Horizontal" item-template="project://database/Assets/CoreSamples/UI/Toolkit/xml_Toggle%20Tile.uxml?fileID=9197481963319205126&amp;guid=610c0c0cfb6f1874e93b9601e4ade49a&amp;type=3#xml_Toggle Tile" auto-scroll-ease="OutBounce" auto-scroll-duration="1" scroll-deceleration-duration="0.3" direction="Horizontal" tile-size="160px" style="display: flex; flex-grow: 1;" />
-</ui:UXML>

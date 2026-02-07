@@ -20,12 +20,12 @@ namespace NiqonNO.UI
 
 		private Vector3 NormalizedValue = new (0.33f, 0.34f, 0.33f);
 
-		public NOTernarySlider() : this(string.Empty)
-		{
-		}
+		public NOTernarySlider() : this(string.Empty) { }
 
 		public NOTernarySlider(string label) : base(label, new NOAspectRatioFitterElement())
 		{
+			styleSheets.Add(NOUSS.GetStyleSheet(NOUSS.TernaryStylePath));
+			
 			AddToClassList(NOUSS.TernaryClass);
 			labelElement.AddToClassList(NOUSS.TernaryLabelClass);
 			InputContainer = this.Q(className: inputUssClassName);
