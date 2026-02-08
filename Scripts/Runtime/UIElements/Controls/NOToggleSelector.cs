@@ -17,25 +17,77 @@ namespace NiqonNO.UI
 
         private readonly NOContentScroller ScrollerManipulator;
 
-        [UxmlAttribute]
-        private ScrollDirection Direction { get => _Direction; set { _Direction = value; ScrollerManipulator?.SetDirection(_Direction); UpdateScrollDirection(); } }
+        private bool ApplyScheduled;
+        private bool PositionDirty;
+        private bool ScrollerDirty;
+        private bool LayoutDirty;
+        private bool PoolDirty;
+
         private ScrollDirection _Direction;
-        
-        [UxmlAttribute, Range(0.01f, 10.0f)]
-        private float TileAspectRatio { get => _TileAspectRatio; set { _TileAspectRatio = value; ResizeTiles(); } }
+        [UxmlAttribute]
+        private ScrollDirection Direction
+        {
+            get => _Direction;
+            set
+            {
+                if (_Direction == value) return;
+                _Direction = value;
+                MarkDirty(scroller: true, layout: true);
+            }
+        }
+
         private float _TileAspectRatio;
-        
-        [UxmlAttribute]
-        private NOEase AutoScrollEase { get => _AutoScrollEase; set { _AutoScrollEase = value; ScrollerManipulator?.SetCenteringEase(_AutoScrollEase); }  }
+        [UxmlAttribute, Range(0.01f, 10.0f)]
+        private float TileAspectRatio
+        {
+            get => _TileAspectRatio;
+            set
+            {
+                if (Mathf.Approximately(_TileAspectRatio, value)) return;
+                _TileAspectRatio = value;
+                MarkDirty(scroller: true, layout: true);
+            }
+        }
+
         private NOEase _AutoScrollEase;
-        
-        [UxmlAttribute] 
-        private float AutoScrollDuration { get => _AutoScrollDuration; set { _AutoScrollDuration = value; ScrollerManipulator?.SetCenteringDuration(_AutoScrollDuration); }  }
-        private float _AutoScrollDuration;
-        
         [UxmlAttribute]
-        private VisualTreeAsset ItemTemplate { get => _ItemTemplate; set { _ItemTemplate = value; Rebuild(); } }
+        private NOEase AutoScrollEase
+        {
+            get => _AutoScrollEase;
+            set
+            {
+                if (_AutoScrollEase == value) return;
+                _AutoScrollEase = value;
+                MarkDirty(scroller: true);
+            }
+        }
+        
+        private float _AutoScrollDuration;
+        [UxmlAttribute]
+        private float AutoScrollDuration
+        {
+            get => _AutoScrollDuration;
+            set
+            {
+                if (Mathf.Approximately(_AutoScrollDuration, value)) return;
+                _AutoScrollDuration = value;
+                MarkDirty(scroller: true);
+            }
+        }
+
         private VisualTreeAsset _ItemTemplate;
+        [UxmlAttribute]
+        private VisualTreeAsset ItemTemplate
+        {
+            get => _ItemTemplate;
+            set
+            {
+                if (_ItemTemplate == value) return;
+                _ItemTemplate = value;
+                ClearPool();
+                MarkDirty(pool: true);
+            }
+        }
 
         private float ViewportMainSize => Direction == ScrollDirection.Vertical
             ? ContentViewport.contentRect.height : ContentViewport.contentRect.width;
@@ -45,66 +97,108 @@ namespace NiqonNO.UI
 
         public NOToggleSelector() : this(string.Empty) {  }
 
-        public NOToggleSelector(string label, 
+        public NOToggleSelector(string label,
             float tileAspectRatio = 1.0f, ScrollDirection scrollDirection = ScrollDirection.Vertical,
             NOEase centeringEase = NOEase.Linear, float centeringDuration = 0.3f)
         {
-            styleSheets.Add(NOUSS.GetStyleSheet(NOUSS.ToggleSelectorStylePath));
-            
             _TileAspectRatio = tileAspectRatio;
             _Direction = scrollDirection;
             _AutoScrollEase = centeringEase;
             _AutoScrollDuration = centeringDuration;
-            
+
+            styleSheets.Add(NOUSS.GetStyleSheet(NOUSS.ToggleSelectorStylePath));
             AddToClassList(NOUSS.ItemSelectorClass);
-            if (label != null)
+
+            if (!string.IsNullOrEmpty(label))
             {
                 LabelElement = new Label(label);
                 LabelElement.AddToClassList(NOUSS.ToggleSelectorLabelClass);
                 Add(LabelElement);
             }
+
             InputContainer = new VisualElement();
             InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerClass);
-            Add(InputContainer);
 
             ContentViewport = new VisualElement { name = "toggle-selector-content-viewport", pickingMode = PickingMode.Ignore, };
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
-            ContentViewport.RegisterCallback<GeometryChangedEvent>(UpdatePool);
+            ContentViewport.RegisterCallback<GeometryChangedEvent>(OnViewportGeometryChanged);
 
-            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, TilePixelSize, scrollDirection, centeringEase, centeringDuration);
+            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, TilePixelSize, scrollDirection,
+                centeringEase, centeringDuration);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
+            ContentContainer.RegisterCallback<GeometryChangedEvent>(OnContainerGeometryChanged);
             ContentContainer.AddManipulator(ScrollerManipulator);
-            
-            PreviousButton = new Button(ScrollerManipulator.ScrollToPrevious) { name = "toggle-selector-previous",  };
+
+            PreviousButton = new Button(ScrollerManipulator.ScrollToPrevious) { name = "toggle-selector-previous", };
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonPreviousClass);
-            
+
             NextButton = new Button(ScrollerManipulator.ScrollToNext) { name = "toggle-selector-next", };
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonNextClass);
-            
+
+            Add(InputContainer);
             InputContainer.Add(PreviousButton);
             InputContainer.Add(ContentViewport);
             ContentViewport.Add(ContentContainer);
             InputContainer.Add(NextButton);
-            
-            UpdateScrollDirection();
+
+            //MarkDirty(true, true);
+        }
+
+        private void OnContainerGeometryChanged(GeometryChangedEvent evt)
+        {
+            if (evt.oldRect.size == evt.newRect.size) return;
+            MarkDirty(position: true, layout: true);
+        }
+        private void OnViewportGeometryChanged(GeometryChangedEvent evt)
+        {
+            if (evt.oldRect.size == evt.newRect.size) return;
+            MarkDirty(position: true, pool: true);
         }
         
-        private void Rebuild()
+        private void MarkDirty(bool position = false, bool scroller = false, bool layout = false, bool pool = false)
         {
-            ClearPool();
-            UpdatePool();
-        }
-        private void UpdatePool(GeometryChangedEvent evt) => UpdatePool();
-        private void UpdatePool()
-        {
-            if (ItemTemplate == null)
+            PositionDirty |= position;
+            ScrollerDirty |= scroller;
+            LayoutDirty |= layout;
+            PoolDirty |= pool;
+
+            if (ApplyScheduled)
                 return;
 
-            ResizeItemPool();
-            RefreshTiles();
+            ApplyScheduled = true;
+            schedule.Execute(ApplyState);
+        }
+        
+        private void ApplyState()
+        {
+            ApplyScheduled = false;
+            
+            if (PoolDirty)
+            {
+                RebuildPool();
+                PoolDirty = false;
+            }
+
+            if (LayoutDirty)
+            {
+                ApplyLayout();
+                LayoutDirty = false;
+            }
+            
+            if (ScrollerDirty)
+            {
+                UpdateScroller();
+                ScrollerDirty = false;
+            }
+            
+            if(PositionDirty)
+            {
+                ScrollerManipulator.UpdatePosition();
+                PositionDirty = false;
+            }
         }
 
         private void ClearPool()
@@ -114,72 +208,101 @@ namespace NiqonNO.UI
                 ContentContainer.RemoveAt(0);
             }
         }
-        private void ResizeItemPool()
+        
+        private void RebuildPool()
         {
-            int count = Mathf.Max(0, Mathf.CeilToInt(ViewportMainSize / TilePixelSize));
-            count += 1 + count%2;
+            EnsurePoolSize();
+            BindVisibleItems();
+        }
+        
+        private void EnsurePoolSize()
+        {
+            int required = ComputeRequiredTileCount();
+            int current = ContentContainer.childCount;
 
-            if (ContentContainer.childCount < count) SpawnTile();
-            else if (ContentContainer.childCount > count) RemoveTiles();
-            ResizeTiles();
-            return;
-           
-            void SpawnTile()
+            while (current < required)
             {
-                for (int i = ContentContainer.childCount; i < count; i++)
-                {
-                    var item = ItemTemplate.Instantiate();
-                    item.AddToClassList(NOUSS.ToggleSelectorTile);
-                    ContentContainer.Add(item);
-                }
+                var item = ItemTemplate.Instantiate();
+                item.AddToClassList(NOUSS.ToggleSelectorTile);
+                ContentContainer.Add(item);
+                current++;
             }
-            void RemoveTiles()
+
+            while (current > required)
             {
-                for (int i = ContentContainer.childCount; i > count; i--)
-                {
-                    ContentContainer.RemoveAt(0);
-                }
+                ContentContainer.RemoveAt(0);
+                current--;
+            }
+
+            return;
+
+            int ComputeRequiredTileCount()
+            {
+                if (ItemTemplate == null) return 0;
+                int count = Mathf.Max(0, Mathf.CeilToInt(ViewportMainSize / TilePixelSize));
+                return count + 1 + count % 2;
             }
         }
-        private void ResizeTiles()
+        
+        private void ApplyLayout()
         {
-            if (ContentContainer.childCount == 0) return;
+            ApplyDirectionClasses();
+            ApplyTileSizes();
+        }
+        
+        private void ApplyDirectionClasses()
+        {
+            bool vertical = Direction == ScrollDirection.Vertical;
             
+            InputContainer.EnableInClassList(NOUSS.ToggleSelectorInputContainerVerticalClass, vertical);
+            InputContainer.EnableInClassList(NOUSS.ToggleSelectorInputContainerHorizontalClass, !vertical);
+
+            ContentViewport.EnableInClassList(NOUSS.ToggleSelectorViewportVerticalClass, vertical);
+            ContentViewport.EnableInClassList(NOUSS.ToggleSelectorViewportHorizontalClass, !vertical);
+
+            ContentContainer.EnableInClassList(NOUSS.ToggleSelectorContentContainerVerticalClass, vertical);
+            ContentContainer.EnableInClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass, !vertical);
+        }
+        
+        private void ApplyTileSizes()
+        {
             for (int i = 0; i < ContentContainer.childCount; i++)
             {
-                switch (Direction)
+                var tile = ContentContainer[i];
+
+                if (Direction == ScrollDirection.Vertical)
                 {
-                    case ScrollDirection.Vertical:
-                        ContentContainer[i].style.width = Length.Percent(100);
-                        ContentContainer[i].style.height = TilePixelSize;
-                        break;
-                    case ScrollDirection.Horizontal:
-                        ContentContainer[i].style.width = TilePixelSize;
-                        ContentContainer[i].style.height = Length.Percent(100);
-                        break;
+                    tile.style.width = Length.Percent(100);
+                    tile.style.height = TilePixelSize;
+                }
+                else
+                {
+                    tile.style.width = TilePixelSize;
+                    tile.style.height = Length.Percent(100);
                 }
             }
-            ScrollerManipulator?.SetTileSize(TilePixelSize);
-            CenterOnSelection();
         }
-
-        protected override void Refresh() => RefreshTiles();
-        private void RefreshTiles()
+        
+        private void UpdateScroller()
         {
-            if (ContentContainer.childCount == 0) return;
-            
-            var pooledTiles = ContentContainer.childCount;
-            int itemIndex = SelectedIndex - Mathf.FloorToInt(pooledTiles / 2.0f);
-
-            for (int i = 0; i < pooledTiles; i++, itemIndex++)
-            {
-                BindTileData(ContentContainer[i], GetItem(itemIndex));
-            }
-
-            CenterOnSelection();
+            ScrollerManipulator.SetDirection(Direction);
+            ScrollerManipulator.SetTileSize(TilePixelSize);
+            ScrollerManipulator.SetCenteringEase(AutoScrollEase);
+            ScrollerManipulator.SetCenteringDuration(AutoScrollDuration);
         }
 
-        private void CenterOnSelection() => ScrollerManipulator?.UpdatePosition();
+        protected override void Refresh() => BindVisibleItems();
+        private void BindVisibleItems()
+        {
+            if (ContentContainer.childCount == 0)
+                return;
+
+            int pooled = ContentContainer.childCount;
+            int startIndex = SelectedIndex - pooled / 2;
+
+            for (int i = 0; i < pooled; i++)
+                BindTileData(ContentContainer[i], GetItem(startIndex + i));
+        }
         
         private void JumpNext()
         {
@@ -198,31 +321,6 @@ namespace NiqonNO.UI
         private void BindTileData(VisualElement visualElement, INOBindingContext dataCollection)
         {
             dataCollection?.Bind(visualElement);
-        }
- 
-        private void UpdateScrollDirection()
-        {
-            InputContainer.RemoveFromClassList(NOUSS.ToggleSelectorInputContainerVerticalClass);
-            InputContainer.RemoveFromClassList(NOUSS.ToggleSelectorInputContainerHorizontalClass);
-            ContentViewport.RemoveFromClassList(NOUSS.ToggleSelectorViewportVerticalClass);
-            ContentViewport.RemoveFromClassList(NOUSS.ToggleSelectorViewportHorizontalClass);
-            ContentContainer.RemoveFromClassList(NOUSS.ToggleSelectorContentContainerVerticalClass);
-            ContentContainer.RemoveFromClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass);
-            switch (Direction)
-            {
-                case ScrollDirection.Vertical:
-                    InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerVerticalClass);
-                    ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportVerticalClass);
-                    ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerVerticalClass);
-                    break;
-                case ScrollDirection.Horizontal:
-                    InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerHorizontalClass);
-                    ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportHorizontalClass);
-                    ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerHorizontalClass);
-                    break;
-            }
-
-            ResizeTiles();
         }
     }
 }
