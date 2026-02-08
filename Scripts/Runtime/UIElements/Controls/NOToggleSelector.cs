@@ -38,9 +38,9 @@ namespace NiqonNO.UI
         private VisualTreeAsset _ItemTemplate;
 
         private float ViewportMainSize => Direction == ScrollDirection.Vertical
-            ? ContentViewport.resolvedStyle.height : ContentViewport.resolvedStyle.width;
+            ? ContentViewport.contentRect.height : ContentViewport.contentRect.width;
         private float ViewportCrossSize => Direction == ScrollDirection.Vertical
-            ? ContentViewport.resolvedStyle.width : ContentViewport.resolvedStyle.height;
+            ? ContentViewport.contentRect.width : ContentViewport.contentRect.height;
         private float TilePixelSize => ViewportCrossSize * TileAspectRatio;
 
         public NOToggleSelector() : this(string.Empty) {  }

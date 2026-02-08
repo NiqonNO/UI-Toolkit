@@ -200,9 +200,12 @@ namespace NiqonNO.UI
 		
 		public void UpdatePosition()
 		{
+			float contentSize = target.contentRect.size[Axis];
+			float viewportSize = target.parent.contentRect.size[Axis];
+			
 			Vector3 position = target.transform.position;
 			position[Direction] = 0;
-			position[Axis] = -((target.layout.size[Axis] - target.parent.layout.size[Axis]) / 2.0f) + DragDelta;
+			position[Axis] = -(contentSize - viewportSize) / 2.0f + DragDelta;
 			target.transform.position = position;
 		}
 
