@@ -8,7 +8,7 @@ namespace NiqonNO.UI
 	public class NOTernarySlider : BaseField<Vector3>
 	{
 		private readonly VisualElement InputContainer;
-		private readonly VisualElement BackgroundElement;
+		private readonly VisualElement AspectHolderElement;
 		private readonly VisualElement DragContainer;
 		private readonly VisualElement DragHandle;
 
@@ -22,17 +22,15 @@ namespace NiqonNO.UI
 
 		public NOTernarySlider() : this(string.Empty) { }
 
-		public NOTernarySlider(string label) : base(label, new NOAspectRatioFitterElement())
+		public NOTernarySlider(string label) : base(label, new VisualElement())
 		{
 			styleSheets.Add(NOUSS.GetStyleSheet(NOUSS.TernaryStylePath));
 			
 			AddToClassList(NOUSS.TernaryClass);
 			labelElement.AddToClassList(NOUSS.TernaryLabelClass);
+			
 			InputContainer = this.Q(className: inputUssClassName);
 			InputContainer.AddToClassList(NOUSS.TernaryInputContainerClass);
-
-			BackgroundElement = new VisualElement { name = "ternary-background" };
-			BackgroundElement.AddToClassList(NOUSS.TernaryBackgroundClass);
 			
 			DragHandle = new VisualElement { name = "ternary-drag-handle", usageHints = UsageHints.DynamicTransform, };
 			DragHandle.AddToClassList(NOUSS.TernaryHandleClass);
@@ -44,8 +42,7 @@ namespace NiqonNO.UI
 			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 			DragContainer.AddManipulator(dragger);
 			
-			InputContainer.Add(BackgroundElement);
-			BackgroundElement.Add(DragContainer);
+			InputContainer.Add(DragContainer);
 			DragContainer.Add(DragHandle);
 		}
 

@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
-	[UxmlElement]
+	[UxmlElement, Obsolete("NOAspectRatioFitterElement is deprecated. As from Unity 6.3, there is an built in solution.", false)]
 	public partial class NOAspectRatioFitterElement : VisualElement
 	{
 		static readonly CustomStyleProperty<int> StyleRatioHeight = new CustomStyleProperty<int>("--ratio-height");
