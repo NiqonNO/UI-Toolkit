@@ -1,25 +1,36 @@
 .ternary-slider__input-container {
-    overflow: visible;
-    aspect-ratio: 1.132743;
-    background-image: url("project://database/Assets/_UIToolkit/Graphics/sprt_Triangle%201.png?fileID=1130617326&guid=2f443599d2594564d87c7408b8c41264&type=3#triangle1_0");
+    aspect-ratio: 1.141653;
+    background-image: url("project://database/Assets/_UIToolkit/Graphics/svg_Triangle.svg?fileID=7388822144124034973&guid=0b024de976d110d4491b252448ca28ea&type=3#svg_Triangle");
+    -unity-background-image-tint-color: rgb(184, 184, 184);
+    -unity-background-scale-mode: stretch-to-fill;
 }
 
-
-
 .ternary-slider__drag-area {
-    padding-top: 4%;
-    padding-right: 4%;
-    padding-bottom: 4%;
-    padding-left: 4%;
     flex-grow: 1;
-    align-self: stretch;
+    background-image: url("project://database/Assets/_UIToolkit/Graphics/svg_Triangle.svg?fileID=7388822144124034973&guid=0b024de976d110d4491b252448ca28ea&type=3#svg_Triangle");
+    -unity-background-image-tint-color: rgb(93, 93, 93);
+    margin-top: 5%;
+    margin-right: 5%;
+    margin-bottom: 3%;
+    margin-left: 5%;
 }
 
 .ternary-slider__handle {
-    background-image: url("project://database/Assets/_UIToolkit/Graphics/sprt_Knob.png?fileID=-2684344430345912852&guid=0f0dc8b0d8f501349beefc72d05891ba&type=3#circle1_0");
-    -unity-background-image-tint-color: rgb(255, 255, 255);
-    -unity-background-scale-mode: scale-to-fit;
-    height: 10%;
+    height: 12%;
     translate: -50% -50%;
-    width: 10%;
+    width: 12%;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-left-color: rgb(184, 184, 184);
+    border-right-color: rgb(184, 184, 184);
+    border-top-color: rgb(184, 184, 184);
+    border-bottom-color: rgb(184, 184, 184);
+    aspect-ratio: 1;
+    background-color: rgb(93, 93, 93);
 }

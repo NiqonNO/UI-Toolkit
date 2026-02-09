@@ -32,10 +32,6 @@ namespace NiqonNO.UI
 			target.RegisterCallback<PointerDownEvent>(OnPointerDown);
 			target.RegisterCallback<PointerMoveEvent>(OnPointerMove);
 			target.RegisterCallback<PointerUpEvent>(OnPointerUp);
-			
-#if UNITY_EDITOR
-			target.generateVisualContent += OnGenerateVisualContent;
-#endif
 		}
 
 		protected override void UnregisterCallbacksFromTarget()
@@ -43,10 +39,6 @@ namespace NiqonNO.UI
 			target.UnregisterCallback<PointerDownEvent>(OnPointerDown);
 			target.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
 			target.UnregisterCallback<PointerUpEvent>(OnPointerUp);
-			
-#if UNITY_EDITOR
-			target.generateVisualContent -= OnGenerateVisualContent;
-#endif
 		}
 
 		private void OnPointerDown(PointerDownEvent evt)
@@ -151,24 +143,5 @@ namespace NiqonNO.UI
 
 			return new Vector3(x, y, z);
 		}
-		
-#if UNITY_EDITOR
-		void OnGenerateVisualContent(MeshGenerationContext ctx)
-		{
-			if (Application.isPlaying) return;
-			
-			var painter = ctx.painter2D;
-			Rect rect = target.contentRect;
-			painter.lineWidth = Mathf.Min(rect.width, rect.height) * 0.005f;
-			painter.strokeColor = Color.magenta;
-
-			painter.BeginPath();
-			painter.MoveTo(rect.position + LeftCorner * rect.size);
-			painter.LineTo(rect.position + TopCorner * rect.size);
-			painter.LineTo(rect.position + RightCorner * rect.size);
-			painter.LineTo(rect.position + LeftCorner * rect.size);
-			painter.Stroke();
-		}
-#endif
 	}
 }
