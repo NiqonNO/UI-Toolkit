@@ -9,7 +9,6 @@ namespace NiqonNO.UI
 		private readonly Action OnReachNext;
 		private readonly Action OnReachPrevious;
 		
-		private int Direction;
 		private int Axis;
 		private float TileSize;
 
@@ -43,7 +42,7 @@ namespace NiqonNO.UI
 		}
 		
 		public void SetTileSize(float size) { TileSize = size; }
-		public void SetDirection(ScrollDirection direction) { Direction = (int)direction; Axis = 1 - Direction; }
+		public void SetDirection(ScrollDirection direction) { Axis = 1 - (int)direction; }
 		public void SetCenteringEase(NOEase ease) => AutoScroll.SetEase(ease);
 		public void SetCenteringDuration(float duration) => AutoScroll.SetDuration(duration);
 		public void SetScrollDecelerationEase(NOEase ease) => ManualScroll.SetEase(ease);
@@ -198,11 +197,21 @@ namespace NiqonNO.UI
 		{
 			float contentSize = target.contentRect.size[Axis];
 			float viewportSize = target.parent.contentRect.size[Axis];
+
+			Length size = Length.Pixels(-(contentSize - viewportSize) / 2.0f + DragDelta);
+			Translate position = new Translate();
 			
-			Vector3 position = target.transform.position;
-			position[Direction] = 0;
-			position[Axis] = -(contentSize - viewportSize) / 2.0f + DragDelta;
-			target.transform.position = position;
+			switch (Axis)
+			{
+				case 0:
+					position.x = size;
+					break;
+				case 1:
+					position.y = size;
+					break;
+			}
+
+			target.style.translate = position;
 		}
 
 		private class ScrollTween
