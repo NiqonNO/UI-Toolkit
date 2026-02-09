@@ -123,8 +123,7 @@ namespace NiqonNO.UI
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(OnViewportGeometryChanged);
 
-            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, TilePixelSize, scrollDirection,
-                centeringEase, centeringDuration);
+            ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, TilePixelSize, scrollDirection, centeringEase, centeringDuration);
             ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.RegisterCallback<GeometryChangedEvent>(OnContainerGeometryChanged);
@@ -143,19 +142,17 @@ namespace NiqonNO.UI
             InputContainer.Add(ContentViewport);
             ContentViewport.Add(ContentContainer);
             InputContainer.Add(NextButton);
-
-            //MarkDirty(true, true);
         }
 
         private void OnContainerGeometryChanged(GeometryChangedEvent evt)
         {
             if (evt.oldRect.size == evt.newRect.size) return;
-            MarkDirty(position: true, layout: true);
+            MarkDirty(position: true, scroller: true, layout: true);
         }
         private void OnViewportGeometryChanged(GeometryChangedEvent evt)
         {
             if (evt.oldRect.size == evt.newRect.size) return;
-            MarkDirty(position: true, pool: true);
+            MarkDirty(position: true, scroller: true, layout: true, pool: true);
         }
         
         private void MarkDirty(bool position = false, bool scroller = false, bool layout = false, bool pool = false)

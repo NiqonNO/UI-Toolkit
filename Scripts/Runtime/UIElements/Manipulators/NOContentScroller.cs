@@ -42,11 +42,7 @@ namespace NiqonNO.UI
 			ManualScroll = new ScrollTween().SetEase(decelerationEase).SetDuration(decelerationDuration).OnTick(OnManualScroll).OnComplete(RunAutoScroll);
 		}
 		
-		public void SetTileSize(float size)
-		{
-			TileSize = size;
-		}
-
+		public void SetTileSize(float size) { TileSize = size; }
 		public void SetDirection(ScrollDirection direction) { Direction = (int)direction; Axis = 1 - Direction; }
 		public void SetCenteringEase(NOEase ease) => AutoScroll.SetEase(ease);
 		public void SetCenteringDuration(float duration) => AutoScroll.SetDuration(duration);
