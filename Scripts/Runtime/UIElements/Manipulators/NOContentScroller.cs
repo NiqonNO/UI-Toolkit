@@ -129,7 +129,9 @@ namespace NiqonNO.UI
 		private void OnScroll(WheelEvent evt)
 		{
 			if (Hold) return;
-			RunManualScroll(evt.delta.y * 5);
+
+			float power = evt.delta.magnitude * Time.fixedDeltaTime * TileSize;
+			RunManualScroll(power * Mathf.Sign(evt.delta.x + evt.delta.y));
 		}
 
 		private void Scroll()
@@ -236,8 +238,7 @@ namespace NiqonNO.UI
 			{ TickEvent = value; return this; }
 			public ScrollTween OnComplete(Action value)
 			{ CompleteEvent = value; return this; }
-
-
+			
 			public void Run(VisualElement target, float startValue)
 			{
 				Start = startValue;
