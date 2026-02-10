@@ -1,22 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NiqonNO.UI.MVVM;
+using Unity.Properties;
 
-namespace NiqonNO.UI
+namespace NiqonNO.UI.MVVM
 {
-	public class NOBindingContextCollection<T> where T : INOBindingContext
+	public abstract class NOCollectionViewModel<TProvider, TData>  : NOViewModel<TProvider> where TProvider : class, INOBindingDataCollection<TData>
 	{
 		public event Action ValueChangedEvent;
-		
-		private List<T> DataSource;
+
 		private List<INOBindingContext> _Data;
 
-		public List<INOBindingContext> Data
+		[CreateProperty]
+		protected List<INOBindingContext> Data
 		{
 			get
 			{
-				if (DataSource.Count != _Data.Count)
+				if (DataProvider.Data.Count != _Data.Count)
 					SynchroniseToData();
 				return _Data;
 			}
@@ -30,21 +30,20 @@ namespace NiqonNO.UI
 			}
 		}
 
-		public NOBindingContextCollection(List<T> dataSource)
+		public NOCollectionViewModel(TProvider dataProvider) : base(dataProvider)
 		{
-			DataSource = dataSource;
 			SynchroniseToData();
 		}
 
 		private void SynchroniseToData()
 		{
-			_Data = DataSource.Cast<INOBindingContext>().ToList();
+			_Data = DataProvider.Data.Cast<INOBindingContext>().ToList();
 			ValueChangedEvent?.Invoke();
 		}
 
 		private void SynchroniseToSource()
 		{
-			DataSource = _Data.Cast<T>().ToList();
+			DataProvider.Data = _Data.Cast<TData>().ToList();
 			ValueChangedEvent?.Invoke();
 		}
 	}
