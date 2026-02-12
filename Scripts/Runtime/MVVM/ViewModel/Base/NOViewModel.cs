@@ -25,7 +25,11 @@ namespace NiqonNO.UI.MVVM
 
 		public override void Bind(VisualElement context)
 		{
-			context.Q(DataProvider.BindTarget).dataSource = this;
+			if (!DataProvider.BindTarget.Bind) return;
+			var bindTarget = context.Q(DataProvider.BindTarget.BindName, DataProvider.BindTarget.BindClass);
+			
+			if (bindTarget == null) return;
+			bindTarget.dataSource = this;
 		}
 	}
 }

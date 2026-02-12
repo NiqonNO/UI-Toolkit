@@ -4,7 +4,7 @@ namespace NiqonNO.UI.MVVM
 {
 	public interface INOBindingData
 	{
-		public string BindTarget { get; }
+		public NOBind BindTarget { get; }
 	}
 
 	public interface INOBindingData<T> : INOBindingData

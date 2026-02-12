@@ -7,7 +7,7 @@ namespace NiqonNO.UI.MVVM
 	public class NOBindingData : INOBindingData
 	{
 		[field: SerializeField] 
-		public string BindTarget { get; private set; }
+		public NOBind BindTarget { get; private set; }
 	}
 	
 	[Serializable]
