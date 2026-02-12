@@ -16,6 +16,11 @@ namespace NiqonNO.UI.MVVM
 		protected NOViewModel(T dataProvider)
 		{
 			DataProvider = dataProvider;
+		}  
+		
+		public virtual void UpdateDataProvider(T dataProvider)
+		{
+			DataProvider = dataProvider;
 		}
 
 		public override void Bind(VisualElement context)
