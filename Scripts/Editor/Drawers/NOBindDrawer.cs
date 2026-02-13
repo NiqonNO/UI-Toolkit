@@ -15,8 +15,8 @@ namespace NiqonNO.UI.Editor.Drawers.PropertyDrawers
 		protected override void Initialize()
 		{
 			BindByProperty = Property.Children["BindBy"];
-			ElementNameProperty = Property.Children["_BindName"];
-			ClassNameProperty = Property.Children["_BindClass"];
+			ElementNameProperty = Property.Children["BindName"];
+			ClassNameProperty = Property.Children["BindClass"];
 		}
 		
 		protected override void DrawPropertyLayout(GUIContent label)

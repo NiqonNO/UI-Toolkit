@@ -8,7 +8,6 @@ namespace NiqonNO.UI
 	public class NOTernarySlider : BaseField<Vector3>
 	{
 		private readonly VisualElement InputContainer;
-		private readonly VisualElement AspectHolderElement;
 		private readonly VisualElement DragContainer;
 		private readonly VisualElement DragHandle;
 

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace NiqonNO.UI.MVVM
 {
@@ -12,12 +14,33 @@ namespace NiqonNO.UI.MVVM
 		[SerializeField] 
 		private BindType BindBy;
 		[SerializeField] 
-		private string _BindName;
+		private string BindName;
 		[SerializeField] 
-		private string _BindClass;
+		private string BindClass;
 		
-		public bool Bind => BindBy != BindType.None;
-		public string BindName => (BindBy & BindType.Name) == 0 || string.IsNullOrEmpty(_BindName) ? null : _BindName;
-		public string BindClass =>(BindBy & BindType.Class) == 0 || string.IsNullOrEmpty(_BindClass) ?  null : _BindClass;
+		private bool BinByName => (BindBy & BindType.Name) != 0 && !string.IsNullOrEmpty(BindName);
+		private bool BinByClass => (BindBy & BindType.Class) != 0 && !string.IsNullOrEmpty(BindClass);
+		
+		public VisualElement QueryTarget(VisualElement root)
+		{
+			if (BindBy == BindType.None) return null;
+			
+			return root.Q(BinByName? BindName: null, BinByClass? BindClass: null);
+		}
+		
+		public IEnumerable<VisualElement> QueryTargets(VisualElement root)
+		{
+			if (BindBy == BindType.None) return null;
+			
+			var query = root.Query();
+
+			if (BinByName)
+				query = query.Name(BindName);
+
+			if (BinByClass)
+				query = query.Class(BindClass);
+
+			return query.ToList();
+		}
 	}
 }

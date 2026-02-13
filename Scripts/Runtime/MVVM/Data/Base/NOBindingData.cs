@@ -1,4 +1,5 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace NiqonNO.UI.MVVM
@@ -8,6 +9,9 @@ namespace NiqonNO.UI.MVVM
 	{
 		[field: SerializeField] 
 		public NOBind BindTarget { get; private set; }
+		
+		[field: SerializeField, PropertyOrder(Single.MaxValue)] 
+		public NOCallback[] Callbacks { get; private set; }
 	}
 	
 	[Serializable]
