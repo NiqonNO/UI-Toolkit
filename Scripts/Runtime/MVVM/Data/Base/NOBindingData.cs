@@ -10,7 +10,7 @@ namespace NiqonNO.UI.MVVM
 		[field: SerializeField] 
 		public NOBind BindTarget { get; private set; }
 		
-		[field: SerializeField, PropertyOrder(Single.MaxValue)] 
+		[field: SerializeField, PropertyOrder(float.MaxValue)] 
 		public NOCallback[] Callbacks { get; private set; }
 	}
 	
