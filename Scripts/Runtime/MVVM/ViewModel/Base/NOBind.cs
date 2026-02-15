@@ -28,7 +28,7 @@ namespace NiqonNO.UI.MVVM
 			return root.Q(BinByName? BindName: null, BinByClass? BindClass: null);
 		}
 		
-		public IEnumerable<VisualElement> QueryTargets(VisualElement root)
+		public List<VisualElement> QueryTargets(VisualElement root)
 		{
 			if (BindBy == BindType.None) return null;
 			

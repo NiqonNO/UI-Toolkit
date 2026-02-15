@@ -1,11 +1,11 @@
-using System;
+using NiqonNO.UI.Callbacks;
 
 namespace NiqonNO.UI.MVVM
 {
 	public interface INOBindingData
 	{
 		public NOBind BindTarget { get; }
-		public NOCallback[] Callbacks { get;  }
+		public NOCallbackHandler[] Callbacks { get;  }
 	}
 
 	public interface INOBindingData<T> : INOBindingData
