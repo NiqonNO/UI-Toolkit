@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -9,7 +10,7 @@ namespace NiqonNO.UI.Callbacks
 	[Serializable]
 	public abstract class NOCallback
 	{
-		[field: SerializeField] 
+		[field: SerializeField, PropertyOrder(float.MaxValue)] 
 		protected UnityEvent Callback { get; private set; }
 
 		private Dictionary<VisualElement, IManipulator> ActiveCallbacks = new ();

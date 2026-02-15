@@ -13,7 +13,7 @@ namespace NiqonNO.UI
 		private readonly Action<Vector3> OnDrag;
 		private readonly VisualElement Handle;
 
-		protected bool IsActive;
+		private bool IsActive;
 		private Vector2 Offset;
 		private int PointerId;
 

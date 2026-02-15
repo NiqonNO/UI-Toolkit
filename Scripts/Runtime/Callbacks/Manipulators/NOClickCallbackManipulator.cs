@@ -3,19 +3,13 @@ using UnityEngine.UIElements;
 
 namespace NiqonNO.UI.Callbacks
 {
-	public class NOClickCallbackManipulator : PointerManipulator
+	public class NOClickCallbackManipulator : Manipulator
 	{
 		private readonly Action Callback;
 		
-		protected bool IsActive;
-		private int PointerId;
-		
 		public NOClickCallbackManipulator(Action callback)
 		{
-			IsActive = false;
-			PointerId = -1;
 			Callback = callback;
-			//activators.Add(new ManipulatorActivationFilter { button = MouseButton });
 		}
 
 		protected override void RegisterCallbacksOnTarget()
