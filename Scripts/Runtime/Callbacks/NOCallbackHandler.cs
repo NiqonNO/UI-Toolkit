@@ -14,25 +14,27 @@ namespace NiqonNO.UI.Callbacks
 		private NOBind BindTarget { get; set; }
 
 		[field: SerializeReference, NOComponentList("Add  Callback")]
-		private List<NOCallback> Callbacks;
+		private List<NOCallback> Callbacks = new ();
 
-		private List<VisualElement> CallbackTargets;
+		private Dictionary<VisualElement, IManipulator> CallbackTargets = new ();
 
 		public void RegisterCallback(VisualElement context)
 		{
 			if (Callbacks.Count == 0) return;
 			if (CallbackTargets is not { Count: 0 }) UnregisterCallback();
 
-			CallbackTargets = BindTarget.QueryTargets(context);
-			if (CallbackTargets is null or { Count: 0 }) return;
+			var targets = BindTarget.QueryTargets(context);
+			if (targets is null or { Count: 0 }) return;
 
-			foreach (var callback in Callbacks)
+			foreach (var target in targets)
 			{
-				callback.EnsureCapacity(CallbackTargets.Count);
-				foreach (var target in CallbackTargets)
+				NOCallbackManipulator manipulator = new NOCallbackManipulator();
+				target.AddManipulator(manipulator);
+				foreach (var callback in Callbacks)
 				{
-					callback.Register(target);
+					callback.Register(manipulator);
 				}
+				CallbackTargets.Add(target, manipulator);
 			}
 		}
 
@@ -40,12 +42,9 @@ namespace NiqonNO.UI.Callbacks
 		{
 			if (CallbackTargets == null) return;
 
-			foreach (var callback in Callbacks)
+			foreach (var target in CallbackTargets)
 			{
-				foreach (var target in CallbackTargets)
-				{
-					callback.Unregister(target);
-				}
+				target.Key.RemoveManipulator(target.Value);
 			}
 
 			CallbackTargets.Clear();
