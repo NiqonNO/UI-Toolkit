@@ -1,4 +1,5 @@
 using System;
+using NiqonNO.Core.Utility;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -48,7 +49,7 @@ namespace NiqonNO.UI
 		public void SetNormalizedValue(Vector3 barycentric)
 		{
 			NormalizedValue = barycentric;
-			value = DenormalizeValue(NormalizedValue);
+			value = NOBarycentricMath.DenormalizeValue(NormalizedValue, LowValue, HighValue);
 		}
 
 		public override void SetValueWithoutNotify(Vector3 barycentric)
@@ -75,100 +76,18 @@ namespace NiqonNO.UI
 					Mathf.Approximately(diff.x + diff.y, Mathf.Epsilon) ? BarycentricConstraint.Z :
 					BarycentricConstraint.None;
 
-				normalized = NormalizeValue(barycentric);
+				normalized = NOBarycentricMath.NormalizeValue(barycentric, LowValue, HighValue);
 			}
 
-			NormalizedValue = Clamp01(normalized, constraint);
+			NormalizedValue = NOBarycentricMath.Clamp01(normalized, constraint);
 
-			if (!RoundToInt) return DenormalizeValue(NormalizedValue);
+			var denoormalized = NOBarycentricMath.DenormalizeValue(NormalizedValue, LowValue, HighValue);
 
-			var roundedBarycentric = Round(DenormalizeValue(NormalizedValue));
-			NormalizedValue = NormalizeValue(roundedBarycentric);
+			if (!RoundToInt) return denoormalized;
+
+			var roundedBarycentric = NOBarycentricMath.Round(denoormalized);
+			NormalizedValue = NOBarycentricMath.NormalizeValue(roundedBarycentric, LowValue, HighValue);
 			return roundedBarycentric;
-		}
-
-		private Vector3 NormalizeValue(Vector3 barycentric) =>
-			(barycentric - Vector3.one * LowValue) / (HighValue - LowValue);
-
-		private Vector3 DenormalizeValue(Vector3 barycentric) =>
-			Vector3.one * LowValue + barycentric * (HighValue - LowValue);
-
-		private Vector3 Clamp01(Vector3 barycentric, BarycentricConstraint constraint)
-		{
-			barycentric.x = Mathf.Clamp01(barycentric.x);
-			barycentric.y = Mathf.Clamp01(barycentric.y);
-			barycentric.z = Mathf.Clamp01(barycentric.z);
-
-			var currentSum = barycentric.x + barycentric.y + barycentric.z;
-			return constraint switch
-			{
-				BarycentricConstraint.X => ClampConstrained(0),
-				BarycentricConstraint.Y => ClampConstrained(1),
-				BarycentricConstraint.Z => ClampConstrained(2),
-				_ => currentSum == 0 ? Vector3.one / 3.0f : barycentric / currentSum
-			};
-
-			Vector3 ClampConstrained(int axis)
-			{
-				var axisNext = (int)Mathf.Repeat(axis + 1, 3);
-				var axisPrev = (int)Mathf.Repeat(axis + 2, 3);
-
-				if (currentSum == 0)
-				{
-					var halfDelta = (1 - barycentric[axis]) / 2.0f;
-					barycentric[axisNext] = halfDelta;
-					barycentric[axisPrev] = halfDelta;
-					return barycentric;
-				}
-
-				var sumDelta = 1 - currentSum;
-				var sum = barycentric[axisNext] + barycentric[axisPrev];
-				var delta = sumDelta * (sum > 0 ? barycentric[axisNext] / sum : 0.5f);
-
-				barycentric[axisNext] = Mathf.Clamp(barycentric[axisNext] + delta, 0, 1 - barycentric[axis]);
-				barycentric[axisPrev] = 1 - barycentric[axis] - barycentric[axisNext];
-				return barycentric;
-			}
-		}
-
-		private static Vector3 Round(Vector3 barycentric)
-		{
-			var floored = new Vector3Int(
-				Mathf.FloorToInt(barycentric.x),
-				Mathf.FloorToInt(barycentric.y),
-				Mathf.FloorToInt(barycentric.z)
-			);
-
-			var targetSum = Mathf.RoundToInt(barycentric.x + barycentric.y + barycentric.z);
-			var currentSum = floored.x + floored.y + floored.z;
-			var delta = targetSum - currentSum;
-
-			if (delta == 0)
-				return floored;
-
-			var fracX = barycentric.x - floored.x;
-			var fracY = barycentric.y - floored.y;
-			var fracZ = barycentric.z - floored.z;
-
-			var minF = Mathf.Min(fracX, Mathf.Min(fracY, fracZ));
-			var maxF = Mathf.Max(fracX, Mathf.Max(fracY, fracZ));
-			var midF = fracX + fracY + fracZ - minF - maxF;
-
-			var threshold = delta == 1 ? maxF : midF;
-			if (fracX >= threshold)
-			{
-				floored.x += 1;
-				delta--;
-			}
-
-			if (fracY >= threshold && delta > 0)
-			{
-				floored.y += 1;
-				delta--;
-			}
-
-			if (fracZ >= threshold && delta > 0) floored.z += 1;
-			return floored;
 		}
 
 		private void UpdateDragElementPosition(GeometryChangedEvent evt) => UpdateDragElementPosition();
@@ -181,14 +100,6 @@ namespace NiqonNO.UI
 
 			DragHandle.style.left = Length.Percent(position.x * 100);
 			DragHandle.style.top = Length.Percent(position.y * 100);
-		}
-
-		enum BarycentricConstraint
-		{
-			None = 0,
-			X = 1,
-			Y = 2,
-			Z = 3
 		}
 
 		[Serializable]

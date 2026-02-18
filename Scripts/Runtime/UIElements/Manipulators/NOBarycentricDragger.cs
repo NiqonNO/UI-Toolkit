@@ -1,4 +1,5 @@
 ﻿using System;
+using NiqonNO.Core.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -90,7 +91,7 @@ namespace NiqonNO.UI
 		private void UpdateDrag(Vector2 localPosition)
 		{
 			var normalizedPosition = NormalizePosition(localPosition + Offset);
-			var barycentric = GetBarycentricFromPosition(normalizedPosition);
+			var barycentric = NOBarycentricMath.GetBarycentricFromPosition(normalizedPosition, LeftCorner, TopCorner, RightCorner);
 			OnDrag?.Invoke(barycentric);
 		}
 
@@ -98,50 +99,6 @@ namespace NiqonNO.UI
 		{
 			Rect rect = target.contentRect;
 			return (localPosition - rect.position) / rect.size;
-		}
-
-		private Vector3 GetBarycentricFromPosition(Vector2 position)
-		{
-			var v0 = LeftCorner - TopCorner;
-			var v1 = RightCorner - TopCorner;
-			var v2 = position - TopCorner;
-
-			var d00 = Vector2.Dot(v0, v0);
-			var d01 = Vector2.Dot(v0, v1);
-			var d11 = Vector2.Dot(v1, v1);
-			var d20 = Vector2.Dot(v2, v0);
-			var d21 = Vector2.Dot(v2, v1);
-
-			var denom = d00 * d11 - d01 * d01;
-			var x = (d11 * d20 - d01 * d21) / denom;
-			var z = (d00 * d21 - d01 * d20) / denom;
-			var y = 1.0f - x - z;
-
-			if (x < 0)
-			{
-				var t = Vector2.Dot(position - TopCorner, RightCorner - TopCorner) /
-				        Vector2.Dot(RightCorner - TopCorner, RightCorner - TopCorner);
-				t = Mathf.Clamp01(t);
-				return new Vector3(0.0f, 1.0f - t, t);
-			}
-
-			if (y < 0)
-			{
-				var t = Vector2.Dot(position - RightCorner, LeftCorner - RightCorner) /
-				        Vector2.Dot(LeftCorner - RightCorner, LeftCorner - RightCorner);
-				t = Mathf.Clamp01(t);
-				return new Vector3(t, 0.0f, 1.0f - t);
-			}
-
-			if (z < 0)
-			{
-				var t = Vector2.Dot(position - LeftCorner, TopCorner - LeftCorner) /
-				        Vector2.Dot(TopCorner - LeftCorner, TopCorner - LeftCorner);
-				t = Mathf.Clamp01(t);
-				return new Vector3(1.0f - t, t, 0.0f);
-			}
-
-			return new Vector3(x, y, z);
 		}
 	}
 }

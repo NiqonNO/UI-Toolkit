@@ -7,7 +7,7 @@ namespace NiqonNO.UI
 {
 	public class NOCallbackManipulator : Manipulator
 	{
-		private HashSet<NOCallback> RegisteredCallbacks = new ();
+		private readonly HashSet<NOCallback> RegisteredCallbacks = new ();
 		protected override void RegisterCallbacksOnTarget() { }
 
 		protected override void UnregisterCallbacksFromTarget()

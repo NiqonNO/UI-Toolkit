@@ -1,6 +1,6 @@
 {
   "name": "com.niqonno.ui-toolit",
-  "version": "2.3.5",
+  "version": "2.4.5",
   "displayName": "NiqonNO UI Toolkit",
   "description": "UI utilities for Toolkit",
   "unity": "6000.3",
@@ -10,6 +10,6 @@
     "url": ""
   },
   "dependencies": {
-    "com.niqonno.core": "https://github.com/NiqonNO/Core.git#1.3.6"
+    "com.niqonno.core": "https://github.com/NiqonNO/Core.git#1.4.6"
   }
 }
