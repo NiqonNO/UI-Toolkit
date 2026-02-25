@@ -4,7 +4,7 @@ using NiqonNO.Core;
 namespace NiqonNO.UI.MVVM
 {
 	[Serializable]
-	public class NOSliderData : NOBindingData<NOFloatValue>
+	public class NOSliderData : NOBindingData<NOValue<float>>
 	{
 	}
 }
