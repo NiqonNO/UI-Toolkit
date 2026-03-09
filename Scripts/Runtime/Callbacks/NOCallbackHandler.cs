@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using NiqonNO.Core;
 using NiqonNO.UI.MVVM;
@@ -7,8 +6,7 @@ using UnityEngine.UIElements;
 
 namespace NiqonNO.UI.Callbacks
 {
-	[Serializable]
-	public class NOCallbackHandler
+	public class NOCallbackHandler : MonoBehaviour
 	{
 		[field: SerializeField] 
 		private NOBind BindTarget { get; set; }
