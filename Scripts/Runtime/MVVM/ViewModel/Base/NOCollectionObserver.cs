@@ -9,7 +9,7 @@ namespace NiqonNO.UI.MVVM
 		Action<List<TSource>> OnValueChanged;
 
 		List<TSource> SourceValue;
-		List<TReturn> ReturnValue;
+		IReadOnlyList<TReturn> ReturnValue;
 
 		public NOCollectionObserver(List<TSource> value, Action<List<TSource>> onValueChanged = null)
 		{
@@ -18,9 +18,9 @@ namespace NiqonNO.UI.MVVM
 			OnValueChanged = onValueChanged;
 		}
 
-		public List<TReturn> Validate(List<TSource> newValue)
+		public IReadOnlyList<TReturn> Validate(List<TSource> newValue)
 		{
-			if (ReferenceEquals(SourceValue, newValue)) return ReturnValue;
+			if (ReturnValue.SequenceEqual((IEnumerable<TReturn>)newValue)) return ReturnValue;
 
 			SourceValue = newValue;
 			ReturnValue = newValue.Cast<TReturn>().ToList();
@@ -28,9 +28,9 @@ namespace NiqonNO.UI.MVVM
 			return ReturnValue;
 		}
 
-		public List<TSource> Validate(List<TReturn> newValue)
+		public List<TSource> Validate(IReadOnlyList<TReturn> newValue)
 		{
-			if (ReferenceEquals(ReturnValue, newValue)) return SourceValue;
+			if (SourceValue.SequenceEqual((IEnumerable<TSource>)newValue)) return SourceValue;
 
 			ReturnValue = newValue;
 			SourceValue = newValue.Cast<TSource>().ToList();

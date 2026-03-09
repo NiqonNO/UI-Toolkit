@@ -11,9 +11,9 @@ namespace NiqonNO.UI
 		private static readonly BindingId SourceCollectionProperty = (BindingId) nameof (SourceCollection);
 		private static readonly BindingId SelectedIndexProperty = (BindingId) nameof (SelectedIndex);
 		
-		private List<T> _SourceCollection;
+		private IReadOnlyList<T> _SourceCollection;
 		[CreateProperty]
-		protected List<T> SourceCollection
+		protected IReadOnlyList<T> SourceCollection
 		{
 			get => _SourceCollection;
 			set
