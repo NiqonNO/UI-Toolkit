@@ -6,7 +6,7 @@ namespace NiqonNO.UI.MVVM
 
 		protected override void OnSourceReady()
 		{
-			Value = SourceProperty.GetValue(SourceProperty.DeclaringType) as T;
+			Value = SourceProperty.GetValue(SourceInstance) as T;
 		}
 	}
 }
