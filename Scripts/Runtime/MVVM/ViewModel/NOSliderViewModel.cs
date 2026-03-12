@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace NiqonNO.UI.MVVM
 {
-	public class NOSliderViewModel : NOViewModel<float>
+	public class NOSliderViewModel : NOPropertyViewModel<float>
 	{
 		[SerializeField] 
 		private string Label;
