@@ -30,10 +30,10 @@ namespace NiqonNO.UI.MVVM
 		private PropertyReference Source;
 		
 		[CreateProperty]
-		private T Value
+		protected T Value
 		{
-			get => Get.Invoke();
-			set => Set.Invoke(value);
+			get => Get != null ? Get() : default;
+			set => Set?.Invoke(value);
 		}
 		
 		private Func<T> Get;
@@ -58,8 +58,10 @@ namespace NiqonNO.UI.MVVM
 		{
 			SourceProperty = Source.Component.GetType().GetProperty(Source.PropertyName, BindingAttr);
 			if (SourceProperty == null) throw new MissingMemberException(Source.Component.GetType().FullName, Source.PropertyName);
-			Get = (Func<T>)Delegate.CreateDelegate(typeof(Func<T>), Source.Component, SourceProperty.GetMethod);
-			Set = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), Source.Component, SourceProperty.SetMethod);
+			if(SourceProperty.CanRead)
+				Get = (Func<T>)Delegate.CreateDelegate(typeof(Func<T>), Source.Component, SourceProperty.GetMethod);
+			if(SourceProperty.CanWrite)
+				Set = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), Source.Component, SourceProperty.SetMethod);
 			DelegatesCreated = true;
 		}
 
