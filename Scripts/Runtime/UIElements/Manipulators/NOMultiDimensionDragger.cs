@@ -1,30 +1,25 @@
-﻿using System;
-using NiqonNO.Core.Utility;
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
-	public class NOBarycentricDragger : PointerManipulator
+	public class NOMultiDimensionDragger : PointerManipulator
 	{
-		private static readonly Vector2 LeftCorner = new(0.0f, 1.0f);
-		private static readonly Vector2 TopCorner = new(0.5f, 0.0f);
-		private static readonly Vector2 RightCorner = new(1.0f, 1.0f);
-
-		private readonly Action<Vector3> OnDrag;
+		private readonly Action<Vector2> OnDrag;
 		private readonly VisualElement Handle;
 
 		private bool IsActive;
 		private Vector2 Offset;
 		private int PointerId;
 
-		public NOBarycentricDragger(VisualElement dragHandle, Action<Vector3> dragHandler)
+		public NOMultiDimensionDragger(VisualElement dragHandle, Action<Vector2> onDrag)
 		{
 			IsActive = false;
 			PointerId = -1;
 			activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse });
 			
-			OnDrag = dragHandler;
+			OnDrag = onDrag;
 			Handle = dragHandle;
 		}
 
@@ -90,9 +85,7 @@ namespace NiqonNO.UI
 
 		private void UpdateDrag(Vector2 localPosition)
 		{
-			var normalizedPosition = NormalizePosition(localPosition + Offset);
-			var barycentric = NOBarycentricMath.GetBarycentricFromPosition(normalizedPosition, LeftCorner, TopCorner, RightCorner);
-			OnDrag?.Invoke(barycentric);
+			OnDrag?.Invoke(NormalizePosition(localPosition + Offset));
 		}
 
 		private Vector2 NormalizePosition(Vector2 localPosition)

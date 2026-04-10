@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
-	public class NOTernarySlider : BaseField<Vector3>
+	public class NOQuaternarySlider : BaseField<Vector4>
 	{
 		private readonly VisualElement InputContainer;
 		private readonly VisualElement DragContainer;
@@ -19,80 +19,84 @@ namespace NiqonNO.UI
 
 		[CreateProperty] public bool RoundToInt { get; set; }
 
-		private Barycentric3 NormalizedValue = Barycentric3.Identity;
+		private Barycentric4 NormalizedValue = Barycentric4.Identity;
 
-		public NOTernarySlider() : this(string.Empty) { }
+		public NOQuaternarySlider() : this(string.Empty)
+		{ }
 
-		public NOTernarySlider(string label) : base(label, new VisualElement())
+		public NOQuaternarySlider(string label) : base(label, new VisualElement())
 		{
-			var styleSheet = NOUSS.GetStyleSheet(NOUSS.TernaryStylePath);
+			var styleSheet = NOUSS.GetStyleSheet(NOUSS.QuaternaryStylePath);
 			if(styleSheet) styleSheets.Add(styleSheet);
-			
-			AddToClassList(NOUSS.TernaryClass);
-			labelElement.AddToClassList(NOUSS.TernaryLabelClass);
-			
+
+			AddToClassList(NOUSS.QuaternaryClass);
+			labelElement.AddToClassList(NOUSS.QuaternaryLabelClass);
+
 			InputContainer = this.Q(className: inputUssClassName);
-			InputContainer.AddToClassList(NOUSS.TernaryInputContainerClass);
-			
-			DragHandle = new VisualElement { name = "ternary-drag-handle", usageHints = UsageHints.DynamicTransform, };
-			DragHandle.AddToClassList(NOUSS.TernaryHandleClass);
+			InputContainer.AddToClassList(NOUSS.QuaternaryInputContainerClass);
+
+			DragHandle = new VisualElement { name = "quaternary-drag-handle", usageHints = UsageHints.DynamicTransform };
+			DragHandle.AddToClassList(NOUSS.QuaternaryHandleClass);
 			DragHandle.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
-			
+
 			var dragger = new NOMultiDimensionDragger(DragHandle, SetValueFromCoordinates);
-			DragContainer = new VisualElement { name = "ternary-drag-area", };
-			DragContainer.AddToClassList(NOUSS.TernaryDragAreaClass);
+			DragContainer = new VisualElement { name = "quaternary-drag-area", };
+			DragContainer.AddToClassList(NOUSS.QuaternaryDragAreaClass);
 			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 			DragContainer.AddManipulator(dragger);
-			
+
 			InputContainer.Add(DragContainer);
 			DragContainer.Add(DragHandle);
 		}
 
 		private void SetValueFromCoordinates(Vector2 coordinates)
 		{
-			SetNormalizedValue(Barycentric3.FromCoordinates(coordinates));
-		}
-		public void SetNormalizedValue(Barycentric3 barycentric)
-		{
-			NormalizedValue = barycentric;
-			value = Barycentric3.DenormalizeValue(NormalizedValue, LowValue, HighValue);
+			SetNormalizedValue(Barycentric4.FromCoordinates(coordinates));
 		}
 
-		public override void SetValueWithoutNotify(Vector3 barycentric)
+		public void SetNormalizedValue(Barycentric4 barycentric)
+		{
+			NormalizedValue = barycentric;
+			value = Barycentric4.DenormalizeValue(NormalizedValue, LowValue, HighValue);
+		}
+
+		public override void SetValueWithoutNotify(Vector4 barycentric)
 		{
 			var validValue = ValidateValue(barycentric);
 			base.SetValueWithoutNotify(validValue);
 			UpdateDragElementPosition();
 		}
 
-		private Vector3 ValidateValue(Vector3 barycentric)
+		private Vector4 ValidateValue(Vector4 barycentric)
 		{
 			var constraint = BarycentricConstraint.None;
 			var normalized = NormalizedValue;
 			if (value != barycentric)
 			{
-				var diff = new Vector3(
+				var diff = new Vector4(
 					Mathf.Abs(value.x - barycentric.x),
 					Mathf.Abs(value.y - barycentric.y),
-					Mathf.Abs(value.z - barycentric.z));
+					Mathf.Abs(value.z - barycentric.z),
+					Mathf.Abs(value.w - barycentric.w));
 
 				constraint =
-					Mathf.Approximately(diff.y + diff.z, Mathf.Epsilon) ? BarycentricConstraint.X :
-					Mathf.Approximately(diff.x + diff.z, Mathf.Epsilon) ? BarycentricConstraint.Y :
-					Mathf.Approximately(diff.x + diff.y, Mathf.Epsilon) ? BarycentricConstraint.Z :
+					Mathf.Approximately(diff.y + diff.z + diff.w, Mathf.Epsilon) ? BarycentricConstraint.X :
+					Mathf.Approximately(diff.x + diff.z + diff.w, Mathf.Epsilon) ? BarycentricConstraint.Y :
+					Mathf.Approximately(diff.x + diff.y + diff.w, Mathf.Epsilon) ? BarycentricConstraint.Z :
+					Mathf.Approximately(diff.x + diff.y + diff.z, Mathf.Epsilon) ? BarycentricConstraint.W :
 					BarycentricConstraint.None;
 
-				normalized = Barycentric3.NormalizeValue(barycentric, LowValue, HighValue);
+				normalized = Barycentric4.NormalizeValue(barycentric, LowValue, HighValue);
 			}
 
-			NormalizedValue = Barycentric3.Clamp01(normalized, constraint);
+			NormalizedValue = Barycentric4.Clamp01(normalized, constraint);
 
-			var denormalized = Barycentric3.DenormalizeValue(NormalizedValue, LowValue, HighValue);
+			var denormalized = Barycentric4.DenormalizeValue(NormalizedValue, LowValue, HighValue);
 
 			if (!RoundToInt) return denormalized;
 
-			var roundedBarycentric = Barycentric3.Round(denormalized);
-			NormalizedValue = Barycentric3.NormalizeValue(roundedBarycentric, LowValue, HighValue);
+			var roundedBarycentric = Barycentric4.Round(denormalized);
+			NormalizedValue = Barycentric4.NormalizeValue(roundedBarycentric, LowValue, HighValue);
 			return roundedBarycentric;
 		}
 
@@ -100,32 +104,35 @@ namespace NiqonNO.UI
 
 		private void UpdateDragElementPosition()
 		{
-			var position = Barycentric3.ToPosition(NormalizedValue);
+			var position = Barycentric4.ToPosition(NormalizedValue);
 			DragHandle.style.left = Length.Percent(position.x * 100);
 			DragHandle.style.top = Length.Percent(position.y * 100);
 		}
 
 		[Serializable]
-		public new class UxmlSerializedData : BaseField<Vector3>.UxmlSerializedData
+		public new class UxmlSerializedData : BaseField<Vector4>.UxmlSerializedData
 		{
 #pragma warning disable 649
 			[HideInInspector] [SerializeField] [UxmlIgnore]
 			private UxmlAttributeFlags LowValue_UxmlAttributeFlags;
+
 			[SerializeField] private int LowValue;
 
 			[SerializeField] [HideInInspector] [UxmlIgnore]
 			private UxmlAttributeFlags HighValue_UxmlAttributeFlags;
+
 			[SerializeField] private int HighValue;
 
 			[SerializeField] [HideInInspector] [UxmlIgnore]
 			private UxmlAttributeFlags RoundToInt_UxmlAttributeFlags;
+
 			[SerializeField] private bool RoundToInt;
 #pragma warning restore 649
 
 			[System.Diagnostics.Conditional("UNITY_EDITOR")]
 			public new static void Register()
 			{
-				BaseField<Vector3>.UxmlSerializedData.Register();
+				BaseField<Vector4>.UxmlSerializedData.Register();
 				UxmlDescriptionCache.RegisterType(typeof(UxmlSerializedData),
 					new UxmlAttributeNames[]
 					{
@@ -135,11 +142,11 @@ namespace NiqonNO.UI
 					});
 			}
 
-			public override object CreateInstance() => new NOTernarySlider();
+			public override object CreateInstance() => new NOQuaternarySlider();
 
 			public override void Deserialize(object obj)
 			{
-				NOTernarySlider slider = (NOTernarySlider)obj;
+				NOQuaternarySlider slider = (NOQuaternarySlider)obj;
 				if (ShouldWriteAttributeValue(LowValue_UxmlAttributeFlags))
 					slider.LowValue = LowValue;
 				if (ShouldWriteAttributeValue(HighValue_UxmlAttributeFlags))

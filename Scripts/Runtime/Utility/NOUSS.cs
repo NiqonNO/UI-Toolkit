@@ -26,6 +26,13 @@ namespace NiqonNO.UI
 		public static readonly string TernaryDragAreaClass = $"{TernaryClass}{DragAreaSuffix}";
 		public static readonly string TernaryHandleClass = $"{TernaryClass}{HandleSuffix}";
 		
+		public const string QuaternaryStylePath = "uss_Quaternary";
+		public const string QuaternaryClass = "quaternary-slider";
+		public static readonly string QuaternaryLabelClass = $"{QuaternaryClass}{LabelSuffix}";
+		public static readonly string QuaternaryInputContainerClass = $"{QuaternaryClass}{InputSuffix}";
+		public static readonly string QuaternaryDragAreaClass = $"{QuaternaryClass}{DragAreaSuffix}";
+		public static readonly string QuaternaryHandleClass = $"{QuaternaryClass}{HandleSuffix}";
+		
 		public const string ToggleSelectorStylePath = "uss_Item Selector";
 		public const string ItemSelectorClass = "toggle-selector";
 		public static readonly string ToggleSelectorLabelClass = $"{ItemSelectorClass}{LabelSuffix}";
