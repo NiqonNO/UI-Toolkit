@@ -19,7 +19,7 @@ namespace NiqonNO.UI
 
 		[CreateProperty] public bool RoundToInt { get; set; }
 
-		private Barycentric3 NormalizedValue = Barycentric3.Identity;
+		private Simplex3 NormalizedValue = Simplex3.Identity;
 
 		public NOTernarySlider() : this(string.Empty) { }
 
@@ -50,12 +50,12 @@ namespace NiqonNO.UI
 
 		private void SetValueFromCoordinates(Vector2 coordinates)
 		{
-			SetNormalizedValue(Barycentric3.FromCoordinates(coordinates));
+			SetNormalizedValue(Simplex3.FromCoordinates(coordinates));
 		}
-		public void SetNormalizedValue(Barycentric3 barycentric)
+		public void SetNormalizedValue(Simplex3 barycentric)
 		{
 			NormalizedValue = barycentric;
-			value = Barycentric3.DenormalizeValue(NormalizedValue, LowValue, HighValue);
+			value = Simplex3.DenormalizeValue(NormalizedValue, LowValue, HighValue);
 		}
 
 		public override void SetValueWithoutNotify(Vector3 barycentric)
@@ -82,17 +82,17 @@ namespace NiqonNO.UI
 					Mathf.Approximately(diff.x + diff.y, Mathf.Epsilon) ? BarycentricConstraint.Z :
 					BarycentricConstraint.None;
 
-				normalized = Barycentric3.NormalizeValue(barycentric, LowValue, HighValue);
+				normalized = Simplex3.NormalizeValue(barycentric, LowValue, HighValue);
 			}
 
-			NormalizedValue = Barycentric3.Clamp01(normalized, constraint);
+			NormalizedValue = Simplex3.Clamp01(normalized, constraint);
 
-			var denormalized = Barycentric3.DenormalizeValue(NormalizedValue, LowValue, HighValue);
+			var denormalized = Simplex3.DenormalizeValue(NormalizedValue, LowValue, HighValue);
 
 			if (!RoundToInt) return denormalized;
 
-			var roundedBarycentric = Barycentric3.Round(denormalized);
-			NormalizedValue = Barycentric3.NormalizeValue(roundedBarycentric, LowValue, HighValue);
+			var roundedBarycentric = Simplex3.Round(denormalized);
+			NormalizedValue = Simplex3.NormalizeValue(roundedBarycentric, LowValue, HighValue);
 			return roundedBarycentric;
 		}
 
@@ -100,7 +100,7 @@ namespace NiqonNO.UI
 
 		private void UpdateDragElementPosition()
 		{
-			var position = Barycentric3.ToPosition(NormalizedValue);
+			var position = Simplex3.ToPosition(NormalizedValue);
 			DragHandle.style.left = Length.Percent(position.x * 100);
 			DragHandle.style.top = Length.Percent(position.y * 100);
 		}
