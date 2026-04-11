@@ -2,7 +2,8 @@
     "name": "NiqonNO.UI.Editor",
     "rootNamespace": "NiqonNO.UI.Editor",
     "references": [
-        "GUID:8b0f7fe0ffc53d6449d78ec39d47222c"
+        "GUID:8b0f7fe0ffc53d6449d78ec39d47222c",
+        "GUID:7a4a295175df90940b5c0b8c4f7b528c"
     ],
     "includePlatforms": [
         "Editor"

@@ -1003,7 +1003,7 @@
     "m_DismissedVersion": 0,
     "m_KeywordType": 1,
     "m_KeywordDefinition": 0,
-    "m_KeywordScope": 0,
+    "m_KeywordScope": 1,
     "m_KeywordStages": 2,
     "m_Entries": [
         {
@@ -1095,7 +1095,7 @@
     "m_AdditionalMotionVectorMode": 0,
     "m_AlembicMotionVectors": false,
     "m_SupportsLODCrossFade": false,
-    "m_CustomEditorGUI": "",
+    "m_CustomEditorGUI": "NiqonNO.UI.Editor.Drawers.PropertyDrawers.NOColorSliderShaderGUI",
     "m_SupportVFX": false
 }
 
