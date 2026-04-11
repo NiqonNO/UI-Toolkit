@@ -21,35 +21,40 @@ namespace NiqonNO.UI
 		
 		public const string TernaryStylePath = "uss_Ternary";
 		public const string TernaryClass = "ternary-slider";
-		public static readonly string TernaryLabelClass = $"{TernaryClass}{LabelSuffix}";
-		public static readonly string TernaryInputContainerClass = $"{TernaryClass}{InputSuffix}";
-		public static readonly string TernaryDragAreaClass = $"{TernaryClass}{DragAreaSuffix}";
-		public static readonly string TernaryHandleClass = $"{TernaryClass}{HandleSuffix}";
+		public const string TernaryLabelClass = TernaryClass + LabelSuffix;
+		public const string TernaryInputContainerClass = TernaryClass + InputSuffix;
+		public const string TernaryDragAreaClass = TernaryClass + DragAreaSuffix;
+		public const string TernaryHandleClass = TernaryClass + HandleSuffix;
 		
 		public const string QuaternaryStylePath = "uss_Quaternary";
 		public const string QuaternaryClass = "quaternary-slider";
-		public static readonly string QuaternaryLabelClass = $"{QuaternaryClass}{LabelSuffix}";
-		public static readonly string QuaternaryInputContainerClass = $"{QuaternaryClass}{InputSuffix}";
-		public static readonly string QuaternaryDragAreaClass = $"{QuaternaryClass}{DragAreaSuffix}";
-		public static readonly string QuaternaryHandleClass = $"{QuaternaryClass}{HandleSuffix}";
+		public const string QuaternaryLabelClass = QuaternaryClass + LabelSuffix;
+		public const string QuaternaryInputContainerClass = QuaternaryClass + InputSuffix;
+		public const string QuaternaryDragAreaClass = QuaternaryClass + DragAreaSuffix;
+		public const string QuaternaryHandleClass = QuaternaryClass + HandleSuffix;
+		
+		public const string ColorPickerStylePath = "uss_Color Picker";
+		public const string ColorPickerClass = "color-picker";
+		public const string ColorPickerLabelClass = ColorPickerClass + LabelSuffix;
+		public const  string ColorPickerInputContainerClass = ColorPickerClass + InputSuffix;
 		
 		public const string ToggleSelectorStylePath = "uss_Item Selector";
 		public const string ItemSelectorClass = "toggle-selector";
-		public static readonly string ToggleSelectorLabelClass = $"{ItemSelectorClass}{LabelSuffix}";
-		public static readonly string ToggleSelectorInputContainerClass = $"{ItemSelectorClass}{InputSuffix}";
-		public static readonly string ToggleSelectorInputContainerVerticalClass = $"{ToggleSelectorInputContainerClass}{VerticalModifier}";
-		public static readonly string ToggleSelectorInputContainerHorizontalClass = $"{ToggleSelectorInputContainerClass}{HorizontalModifier}";
-		public static readonly string ToggleSelectorButtonClass = $"{ItemSelectorClass}{ButtonSuffix}";
-		public static readonly string ToggleSelectorButtonPreviousClass = $"{ToggleSelectorButtonClass}{PreviousModifier}";
-		public static readonly string ToggleSelectorButtonNextClass = $"{ToggleSelectorButtonClass}{NextModifier}";
-		public static readonly string ToggleSelectorViewportClass = $"{ItemSelectorClass}{ViewportSuffix}";
-		public static readonly string ToggleSelectorViewportVerticalClass = $"{ToggleSelectorViewportClass}{VerticalModifier}";
-		public static readonly string ToggleSelectorViewportHorizontalClass = $"{ToggleSelectorViewportClass}{HorizontalModifier}";
-		public static readonly string ToggleSelectorContentContainerClass = $"{ItemSelectorClass}{ContentSuffix}";
-		public static readonly string ToggleSelectorContentContainerVerticalClass = $"{ToggleSelectorContentContainerClass}{VerticalModifier}";
-		public static readonly string ToggleSelectorContentContainerHorizontalClass = $"{ToggleSelectorContentContainerClass}{HorizontalModifier}";
-		public static readonly string ToggleSelectorTile = $"{ItemSelectorClass}{TileSuffix}";
-		
+		public const string ToggleSelectorLabelClass = ItemSelectorClass + LabelSuffix;
+		public const string ToggleSelectorInputContainerClass = ItemSelectorClass + InputSuffix;
+		public const string ToggleSelectorInputContainerVerticalClass = ToggleSelectorInputContainerClass + VerticalModifier;
+		public const string ToggleSelectorInputContainerHorizontalClass = ToggleSelectorInputContainerClass + HorizontalModifier;
+		public const string ToggleSelectorButtonClass = ItemSelectorClass + ButtonSuffix;
+		public const string ToggleSelectorButtonPreviousClass = ToggleSelectorButtonClass + PreviousModifier;
+		public const string ToggleSelectorButtonNextClass = ToggleSelectorButtonClass + NextModifier;
+		public const string ToggleSelectorViewportClass = ItemSelectorClass + ViewportSuffix;
+		public const string ToggleSelectorViewportVerticalClass = ToggleSelectorViewportClass + VerticalModifier;
+		public const string ToggleSelectorViewportHorizontalClass = ToggleSelectorViewportClass + HorizontalModifier;
+		public const string ToggleSelectorContentContainerClass = ItemSelectorClass + ContentSuffix;
+		public const string ToggleSelectorContentContainerVerticalClass = ToggleSelectorContentContainerClass + VerticalModifier;
+		public const string ToggleSelectorContentContainerHorizontalClass = ToggleSelectorContentContainerClass + HorizontalModifier;
+		public const string ToggleSelectorTile = ItemSelectorClass + TileSuffix;
+
 		public static StyleSheet GetStyleSheet(string path) => Resources.Load<StyleSheet>(path);
 	}
 }
