@@ -1,16 +1,28 @@
 .color-picker__input-container {
     flex-direction: row;
+    margin-left: 30px;
+    margin-right: 30px;
+    flex-grow: 1;
+    justify-content: space-around;
 }
 
 .color-picker-plot {
-    flex-grow: 1;
-    aspect-ratio: 1;
     padding-top: 20px;
     padding-right: 20px;
     padding-bottom: 20px;
     padding-left: 20px;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 0;
+    margin-right: 0;
+    aspect-ratio: 1;
+    border-left-color: rgb(184, 184, 184);
+    border-right-color: rgb(184, 184, 184);
+    border-top-color: rgb(184, 184, 184);
+    border-bottom-color: rgb(184, 184, 184);
+    border-top-width: 15px;
+    border-right-width: 15px;
+    border-bottom-width: 15px;
+    border-left-width: 15px;
+    background-color: rgb(93, 93, 93);
 }
 
 .color-picker-plot__drag-area {
@@ -49,4 +61,73 @@
     border-top-right-radius: 50%;
     border-bottom-right-radius: 50%;
     border-bottom-left-radius: 50%;
+}
+
+.color-picker-slider {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-left: 0;
+}
+
+.color-picker-slider__input-container {
+    background-color: rgb(93, 93, 93);
+    border-left-color: rgb(184, 184, 184);
+    border-right-color: rgb(184, 184, 184);
+    border-top-color: rgb(184, 184, 184);
+    border-bottom-color: rgb(184, 184, 184);
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.color-picker-slider__drag-area {
+    margin-bottom: -12px;
+    margin-top: -12px;
+}
+
+.color-picker-slider__tracker {
+    left: auto;
+    margin-top: 12px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.color-picker-slider__handle {
+    left: auto;
+    align-self: center;
+    width: 50px;
+    height: 25px;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    border-left-color: rgb(184, 184, 184);
+    border-right-color: rgb(184, 184, 184);
+    border-top-color: rgb(184, 184, 184);
+    border-bottom-color: rgb(184, 184, 184);
+    background-color: rgb(93, 93, 93);
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+}
+
+.color-picker-slider__preview {
+    flex-grow: 1;
 }

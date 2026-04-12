@@ -11,11 +11,13 @@ namespace NiqonNO.UI
 		private static readonly string[] Keywords = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
 		private static readonly int EdgesOffsetShaderID = Shader.PropertyToID("_Wheel_Edges_Offset");
 		private static readonly int ExternalShaderProperty = Shader.PropertyToID("_External");
+		private static readonly int HueShaderProperty = Shader.PropertyToID("_Hue");
 		
 		private readonly VisualElement InputContainer;
 		private readonly NOColorPickerPlot PickerPlot;
 		private readonly VisualElement PickerColorPreview;
 		private readonly NOColorPickerSlider PickerSlider;
+		private readonly VisualElement SliderColorPreview;
 
 		private ColorPickerType _PickerPlotType;
 		[UxmlAttribute]
@@ -62,6 +64,20 @@ namespace NiqonNO.UI
 			}
 		}
 		
+		private Material PickerSliderMaterial;
+		[UxmlAttribute]
+		private Shader PickerSliderDrawer
+		{
+			get => PickerSliderMaterial != null ? PickerSliderMaterial.shader : null;
+			set
+			{
+				if (value == null) return;
+				PickerSliderMaterial = new Material(value);
+				SetMaterialKeyword();
+				PickerSlider.SetMaterial(PickerSliderMaterial);
+			}
+		}
+		
 		private bool IsColorWheel => PickerPlotType != ColorPickerType.LightnessSaturation_Hue;
 		
 		private Vector3 HSV;
@@ -83,13 +99,17 @@ namespace NiqonNO.UI
 			
 			PickerColorPreview = new VisualElement() { name = "color-picker-drag-handle-color-preview" };
 			PickerColorPreview.AddToClassList(NOUSS.ColorPickerPlotPreviewClass);
+			
+			SliderColorPreview = new VisualElement() { name = "color-slider-drag-handle-color-preview" };
+			SliderColorPreview.AddToClassList(NOUSS.ColorPickerSliderPreviewClass);
 
 			PickerSlider = new NOColorPickerSlider(SliderDirection.Vertical);
 			PickerSlider.RegisterCallback<ChangeEvent<float>>(SetSingle);
 			
 			InputContainer.Add(PickerPlot);
-			PickerPlot.DragHandle.Add(PickerColorPreview);
+			PickerPlot.AddToHandle(PickerColorPreview);
 			InputContainer.Add(PickerSlider);
+			PickerSlider.AddToHandle(SliderColorPreview);
 		}
 
 		void SetMaterialKeyword()
@@ -97,9 +117,15 @@ namespace NiqonNO.UI
 			for (var i = 0; i < Keywords.Length; i++)
 			{
 				if((int)PickerPlotType == i)
-					PickerPlotMaterial.EnableKeyword(Keywords[i]);
+				{
+					PickerPlotMaterial?.EnableKeyword(Keywords[i]);
+					PickerSliderMaterial?.EnableKeyword(Keywords[i]);
+				}
 				else
-					PickerPlotMaterial.DisableKeyword(Keywords[i]);
+				{
+					PickerPlotMaterial?.DisableKeyword(Keywords[i]);
+					PickerSliderMaterial?.DisableKeyword(Keywords[i]);
+				}
 			}
 		}
 		void SetMaterialOffset()
@@ -111,7 +137,7 @@ namespace NiqonNO.UI
 		private void SetSingle(ChangeEvent<float> evt)
 		{
 			HSV.x = evt.newValue;
-			PickerPlotMaterial.SetFloat(ExternalShaderProperty, evt.newValue);
+			PickerPlotMaterial?.SetFloat(ExternalShaderProperty, evt.newValue);
 			OnValueChanged();
 		}
 
@@ -119,12 +145,14 @@ namespace NiqonNO.UI
 		{
 			HSV.y = evt.newValue.x;
 			HSV.z = evt.newValue.y;
+			PickerSliderMaterial?.SetFloat(HueShaderProperty, evt.newValue.y);
 			OnValueChanged();
 		}
 
 		public override void SetValueWithoutNotify(Color newValue)
 		{
 			PickerColorPreview.style.backgroundColor = new StyleColor(newValue);
+			SliderColorPreview.style.backgroundColor = new StyleColor(newValue);
 			base.SetValueWithoutNotify(newValue);
 		}
 		private void OnValueChanged()

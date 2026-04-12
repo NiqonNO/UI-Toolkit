@@ -7,8 +7,8 @@ namespace NiqonNO.UI
 {
 	public class NOColorPickerPlot : BaseField<Vector2>
 	{
-		public VisualElement DragContainer { get; }
-		public VisualElement DragHandle { get; }
+		private VisualElement DragContainer;
+		private VisualElement DragHandle;
 
 		private bool _IsWheel;
 		public bool IsWheel
@@ -39,6 +39,11 @@ namespace NiqonNO.UI
 			
 			Add(DragContainer);
 			DragContainer.Add(DragHandle);
+		}
+
+		public void AddToHandle(VisualElement element)
+		{
+			DragHandle.Add(element);
 		}
 		
 		private void SetValueFromCoordinates(Vector2 coordinates)
