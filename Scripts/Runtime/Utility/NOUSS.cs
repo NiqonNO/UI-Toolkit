@@ -13,6 +13,7 @@ namespace NiqonNO.UI
 		private const string HandleSuffix = "__handle";
 		private const string DragAreaSuffix = "__drag-area";
 		private const string TileSuffix = "__tile";
+		private const string PreviewSuffix = "__preview";
 		
 		private const string NextModifier = "--next";
 		private const string PreviousModifier = "--previous";
@@ -36,7 +37,14 @@ namespace NiqonNO.UI
 		public const string ColorPickerStylePath = "uss_Color Picker";
 		public const string ColorPickerClass = "color-picker";
 		public const string ColorPickerLabelClass = ColorPickerClass + LabelSuffix;
-		public const  string ColorPickerInputContainerClass = ColorPickerClass + InputSuffix;
+		public const string ColorPickerInputContainerClass = ColorPickerClass + InputSuffix;
+		public const string ColorPickerPlotClass = ColorPickerClass + "-plot";
+		public const string ColorPickerPlotDragAreaClass = ColorPickerPlotClass + DragAreaSuffix;
+		public const string ColorPickerPlotHandleClass = ColorPickerPlotClass + HandleSuffix;
+		public const string ColorPickerPlotPreviewClass = ColorPickerPlotClass + PreviewSuffix;
+		public const string ColorPickerSliderClass = ColorPickerClass + "-slider";
+		public const string ColorPickerSliderDragAreaClass = ColorPickerSliderClass + DragAreaSuffix;
+		public const string ColorPickerSliderHandleClass = ColorPickerSliderClass + HandleSuffix;
 		
 		public const string ToggleSelectorStylePath = "uss_Item Selector";
 		public const string ItemSelectorClass = "toggle-selector";

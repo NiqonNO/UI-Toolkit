@@ -1,4 +1,3 @@
-using System;
 using NiqonNO.UI.MVVM;
 using UnityEngine;
 using UnityEngine.UIElements;

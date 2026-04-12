@@ -6,23 +6,12 @@ namespace NiqonNO.UI.Editor.Drawers.PropertyDrawers
 {
 	public class NOColorPickerShaderGUI : NOShaderGUI
 	{
+		private static readonly string[] Keywords = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
+		private static readonly string[] PickerTypes = { "Lightness - Saturation", "Hue - Lightness", "Hue - Saturation" };
+		
 		MaterialProperty PickerType;
 		MaterialProperty EdgesOffset;
 		MaterialProperty ExternalValue;
-
-		string[] PickerTypes = 
-		{
-			"Lightness - Saturation", 
-			"Hue - Lightness", 
-			"Hue - Saturation"
-		};
-		
-		string[] Keywords = 
-		{
-			"_COLOR_PICKER_TYPE_LS_H", 
-			"_COLOR_PICKER_TYPE_HL_S", 
-			"_COLOR_PICKER_TYPE_HS_L"
-		};
 		
 		protected override void FindProperties()
 		{

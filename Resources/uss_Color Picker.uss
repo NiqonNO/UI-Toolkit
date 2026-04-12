@@ -1,0 +1,52 @@
+.color-picker__input-container {
+    flex-direction: row;
+}
+
+.color-picker-plot {
+    flex-grow: 1;
+    aspect-ratio: 1;
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.color-picker-plot__drag-area {
+    background-color: rgb(0, 0, 0);
+    overflow: visible;
+}
+
+.color-picker-plot__handle {
+    width: 12%;
+    height: 12%;
+    aspect-ratio: 1;
+    background-color: rgb(93, 93, 93);
+    border-left-color: rgb(184, 184, 184);
+    border-right-color: rgb(184, 184, 184);
+    border-top-color: rgb(184, 184, 184);
+    border-bottom-color: rgb(184, 184, 184);
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    translate: -50% -50%;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    -unity-material: url("");
+}
+
+.color-picker-plot__preview {
+    flex-grow: 1;
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-bottom-left-radius: 50%;
+}
