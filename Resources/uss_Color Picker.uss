@@ -25,9 +25,19 @@
     background-color: rgb(93, 93, 93);
 }
 
+.color-picker-plot--round {
+}
+
 .color-picker-plot__drag-area {
     background-color: rgb(0, 0, 0);
     overflow: visible;
+}
+
+.color-picker-plot__drag-area--round {
+    border-top-left-radius: 100%;
+    border-top-right-radius: 100%;
+    border-bottom-right-radius: 100%;
+    border-bottom-left-radius: 100%;
 }
 
 .color-picker-plot__handle {

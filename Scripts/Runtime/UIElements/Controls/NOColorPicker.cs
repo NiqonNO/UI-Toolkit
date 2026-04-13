@@ -1,5 +1,6 @@
 using System;
 using Sirenix.OdinInspector;
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,11 +9,6 @@ namespace NiqonNO.UI
 	[UxmlElement]
 	public partial class NOColorPicker : BaseField<Color>
 	{
-		private static readonly string[] Keywords = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
-		private static readonly int EdgesOffsetShaderID = Shader.PropertyToID("_Wheel_Edges_Offset");
-		private static readonly int ExternalShaderProperty = Shader.PropertyToID("_External");
-		private static readonly int HueShaderProperty = Shader.PropertyToID("_Hue");
-		
 		private readonly VisualElement InputContainer;
 		private readonly NOColorPickerPlot PickerPlot;
 		private readonly VisualElement PickerColorPreview;
@@ -20,23 +16,22 @@ namespace NiqonNO.UI
 		private readonly VisualElement SliderColorPreview;
 
 		private ColorPickerType _PickerPlotType;
-		[UxmlAttribute]
+		[UxmlAttribute, CreateProperty]
 		private ColorPickerType PickerPlotType
 		{
 			get => _PickerPlotType;
 			set
 			{
 				if (value == _PickerPlotType) return;
+				Vector3 HSV = GetHSV();
 				_PickerPlotType = value;
-				if (PickerPlotMaterial == null) return;
-				SetMaterialKeyword();
-				PickerPlot.IsWheel = IsColorWheel;
-				OnValueChanged();
+				SetPickerType();
+				SetHSV(HSV);
 			}
 		}
 
 		private Vector2 _EdgesOffset;
-		[UxmlAttribute, MinMaxSlider(0, 1, true), ShowIf(nameof(IsColorWheel))]
+		[UxmlAttribute, CreateProperty, MinMaxSlider(0, 1, true), ShowIf(nameof(IsColorWheel))]
 		private Vector2 EdgesOffset
 		{
 			get => _EdgesOffset;
@@ -44,43 +39,13 @@ namespace NiqonNO.UI
 			{
 				if (value == _EdgesOffset) return;
 				_EdgesOffset = value;
-				if (PickerPlotMaterial == null) return;
-				SetMaterialOffset();
+				SetEdgesOffset();
 			}
 		}
+		
+		private bool IsColorWheel => PickerPlotType != ColorPickerType.ValueSaturation_Hue;
 
-		private Material PickerPlotMaterial;
-		[UxmlAttribute]
-		private Shader PickerPlotDrawer
-		{
-			get => PickerPlotMaterial != null ? PickerPlotMaterial.shader : null;
-			set
-			{
-				if (value == null) return;
-				PickerPlotMaterial = new Material(value);
-				SetMaterialKeyword();
-				SetMaterialOffset();
-				PickerPlot.SetMaterial(PickerPlotMaterial);
-			}
-		}
-		
-		private Material PickerSliderMaterial;
-		[UxmlAttribute]
-		private Shader PickerSliderDrawer
-		{
-			get => PickerSliderMaterial != null ? PickerSliderMaterial.shader : null;
-			set
-			{
-				if (value == null) return;
-				PickerSliderMaterial = new Material(value);
-				SetMaterialKeyword();
-				PickerSlider.SetMaterial(PickerSliderMaterial);
-			}
-		}
-		
-		private bool IsColorWheel => PickerPlotType != ColorPickerType.LightnessSaturation_Hue;
-		
-		private Vector3 HSV;
+		private bool InternalSet;
 		
 		public NOColorPicker() : this(string.Empty) { }
 		public NOColorPicker(string label) : base(label, new VisualElement())
@@ -95,7 +60,7 @@ namespace NiqonNO.UI
 			InputContainer.AddToClassList(NOUSS.ColorPickerInputContainerClass);
 			
 			PickerPlot = new NOColorPickerPlot();
-			PickerPlot.RegisterCallback<ChangeEvent<Vector2>>(SetPolar);
+			PickerPlot.RegisterCallback<ChangeEvent<Vector2>>(OnPlotChange);
 			
 			PickerColorPreview = new VisualElement() { name = "color-picker-drag-handle-color-preview" };
 			PickerColorPreview.AddToClassList(NOUSS.ColorPickerPlotPreviewClass);
@@ -104,74 +69,116 @@ namespace NiqonNO.UI
 			SliderColorPreview.AddToClassList(NOUSS.ColorPickerSliderPreviewClass);
 
 			PickerSlider = new NOColorPickerSlider(SliderDirection.Vertical);
-			PickerSlider.RegisterCallback<ChangeEvent<float>>(SetSingle);
+			PickerSlider.RegisterCallback<ChangeEvent<float>>(OnSliderChange);
 			
 			InputContainer.Add(PickerPlot);
 			PickerPlot.AddToHandle(PickerColorPreview);
 			InputContainer.Add(PickerSlider);
 			PickerSlider.AddToHandle(SliderColorPreview);
+
+			SetPickerType();
+			SetEdgesOffset();
 		}
 
-		void SetMaterialKeyword()
+		Vector3 GetHSV() => PickerPlotType switch
 		{
-			for (var i = 0; i < Keywords.Length; i++)
+			ColorPickerType.ValueSaturation_Hue => new Vector3(PickerSlider.value, PickerPlot.value.x, PickerPlot.value.y),
+			ColorPickerType.HueValue_Saturation => new Vector3(PickerPlot.value.y, PickerSlider.value, PickerPlot.value.x),
+			ColorPickerType.HueSaturation_Value => new Vector3(PickerPlot.value.y, PickerPlot.value.x, PickerSlider.value),
+			_ => GetHSV(value)
+		};
+
+		Vector3 GetHSV(Color color)
+		{
+			Color.RGBToHSV(color, out var hue, out var sat, out var val);
+			switch (PickerPlotType)
 			{
-				if((int)PickerPlotType == i)
-				{
-					PickerPlotMaterial?.EnableKeyword(Keywords[i]);
-					PickerSliderMaterial?.EnableKeyword(Keywords[i]);
-				}
-				else
-				{
-					PickerPlotMaterial?.DisableKeyword(Keywords[i]);
-					PickerSliderMaterial?.DisableKeyword(Keywords[i]);
-				}
+				case ColorPickerType.ValueSaturation_Hue:
+					if (sat == 0 || val == 0) hue = PickerSlider.value;
+					break;
+				case ColorPickerType.HueValue_Saturation:
+					if (sat == 0 || val == 0) hue = PickerPlot.value.y;
+					if (val == 0)             sat = PickerSlider.value;
+					break;
+				case ColorPickerType.HueSaturation_Value:
+					if (sat == 0 || val == 0) hue = PickerPlot.value.y;
+					if (val == 0)             sat = PickerPlot.value.x;
+					break;
+			}
+			return new Vector3(hue, sat, val);
+		}
+
+		void SetHSV(Vector3 hsv)
+		{
+			switch (PickerPlotType)
+			{
+				case ColorPickerType.ValueSaturation_Hue:
+					PickerPlot.SetValueWithoutNotify(new Vector2(hsv.y, hsv.z));
+					PickerPlot.SetMaterialProperty(hsv.x);
+					PickerSlider.SetValueWithoutNotify(hsv.x);
+					break;
+				case ColorPickerType.HueValue_Saturation:
+					PickerPlot.SetValueWithoutNotify(new Vector2(hsv.z, hsv.x));
+					PickerPlot.SetMaterialProperty(hsv.y);
+					PickerSlider.SetValueWithoutNotify(hsv.y);
+					PickerSlider.SetMaterialProperty(hsv.x);
+					break;
+				case ColorPickerType.HueSaturation_Value:
+					PickerPlot.SetValueWithoutNotify(new Vector2(hsv.y, hsv.x));
+					PickerPlot.SetMaterialProperty(hsv.z);
+					PickerSlider.SetValueWithoutNotify(hsv.z);
+					PickerSlider.SetMaterialProperty(hsv.x);
+					break;
 			}
 		}
-		void SetMaterialOffset()
+
+		void SetPickerType()
+		{
+			PickerPlot.SetPickerType((int)PickerPlotType, PickerPlotType != ColorPickerType.ValueSaturation_Hue);
+			PickerSlider.SetPickerType((int)PickerPlotType);
+		}
+
+		void SetEdgesOffset()
 		{
 			Vector4 offset = new Vector4(-EdgesOffset.x, 2-EdgesOffset.y, 0, 0);
-			PickerPlotMaterial.SetVector(EdgesOffsetShaderID, offset);
+			PickerPlot.SetMaterialOffset(offset);
 		}
 
-		private void SetSingle(ChangeEvent<float> evt)
+		private void OnPlotChange(ChangeEvent<Vector2> evt)
 		{
-			HSV.x = evt.newValue;
-			PickerPlotMaterial?.SetFloat(ExternalShaderProperty, evt.newValue);
+			if(IsColorWheel)
+				PickerSlider.SetMaterialProperty(evt.newValue.y);
 			OnValueChanged();
 		}
 
-		private void SetPolar(ChangeEvent<Vector2> evt)
+		private void OnSliderChange(ChangeEvent<float> evt)
 		{
-			HSV.y = evt.newValue.x;
-			HSV.z = evt.newValue.y;
-			PickerSliderMaterial?.SetFloat(HueShaderProperty, evt.newValue.y);
+			PickerPlot.SetMaterialProperty(evt.newValue);
 			OnValueChanged();
 		}
-
-		public override void SetValueWithoutNotify(Color newValue)
-		{
-			PickerColorPreview.style.backgroundColor = new StyleColor(newValue);
-			SliderColorPreview.style.backgroundColor = new StyleColor(newValue);
-			base.SetValueWithoutNotify(newValue);
-		}
+		
 		private void OnValueChanged()
 		{
-			value = PickerPlotType switch
-			{
-				ColorPickerType.LightnessSaturation_Hue => Color.HSVToRGB(HSV.x, HSV.y, HSV.z),
-				ColorPickerType.HueLightness_Saturation => Color.HSVToRGB(HSV.z, HSV.x, HSV.y),
-				ColorPickerType.HueSaturation_Lightness => Color.HSVToRGB(HSV.z, HSV.y, HSV.x),
-				_ => throw new ArgumentOutOfRangeException()
-			};
+			InternalSet = true;
+			Vector3 hsv = GetHSV();
+			value = Color.HSVToRGB(hsv.x, hsv.y, hsv.z);
+			InternalSet = false;
+		}
+		public override void SetValueWithoutNotify(Color newValue)
+		{
+			base.SetValueWithoutNotify(newValue);
+
+			if(!InternalSet) SetHSV(GetHSV(value));
+			PickerColorPreview.style.backgroundColor = new StyleColor(value);
+			SliderColorPreview.style.backgroundColor = new StyleColor(value);
 		}
 
 		[Serializable]
-		enum ColorPickerType
+		public enum ColorPickerType
 		{
-			LightnessSaturation_Hue = 0,
-			HueLightness_Saturation = 1,
-			HueSaturation_Lightness = 2,
+			ValueSaturation_Hue = 0,
+			HueValue_Saturation = 1,
+			HueSaturation_Value = 2,
 		}
 	}
 }

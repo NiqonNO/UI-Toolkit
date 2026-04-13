@@ -1,28 +1,28 @@
 using NiqonNO.Core;
 using NiqonNO.Core.Utility;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
 	public class NOColorPickerPlot : BaseField<Vector2>
 	{
+		private const string PickerDrawerShader = "Shader Graphs/shg_NO_UI_ColorWheel";
+		private static readonly string[] KeywordNames = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
+		private static readonly int EdgesOffsetShaderID = Shader.PropertyToID("_Wheel_Edges_Offset");
+		private static readonly int ExternalShaderProperty = Shader.PropertyToID("_External");
+		private static readonly Shader DrawerShader = Shader.Find(PickerDrawerShader);
+		
 		private VisualElement DragContainer;
 		private VisualElement DragHandle;
 
-		private bool _IsWheel;
-		public bool IsWheel
-		{
-			get => _IsWheel;
-			set
-			{
-				if (_IsWheel == value) return;
-				_IsWheel = value;
-				UpdateCoordinateSystem();
-			}
-		}
-		
-		public NOColorPickerPlot() : base(string.Empty, new VisualElement())
+		private bool UsePolarCoordinates;
+		private MaterialDefinition PickerSliderMaterial;
+		private LocalKeyword[] Keywords;
+
+		public NOColorPickerPlot() : this(DrawerShader) { }
+		public NOColorPickerPlot(Shader pickerDrawerShader) : base(string.Empty, new VisualElement())
 		{
 			name = "color-picker-container";
 			AddToClassList(NOUSS.ColorPickerPlotClass);
@@ -36,27 +36,33 @@ namespace NiqonNO.UI
 			DragContainer.AddToClassList(NOUSS.ColorPickerPlotDragAreaClass);
 			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 			DragContainer.AddManipulator(dragger);
+			DragContainer.style.unityMaterial = CreateMaterial(pickerDrawerShader);
 			
 			Add(DragContainer);
 			DragContainer.Add(DragHandle);
 		}
-
+		
 		public void AddToHandle(VisualElement element)
 		{
 			DragHandle.Add(element);
 		}
 		
+		public override void SetValueWithoutNotify(Vector2 newValue)
+		{
+			base.SetValueWithoutNotify(newValue);
+			UpdateDragElementPosition();
+		}
+		
 		private void SetValueFromCoordinates(Vector2 coordinates)
 		{
-			value = IsWheel ? PolarValueFromPosition(coordinates) : CartesianValueFromPosition(coordinates);
-			UpdateDragElementPosition();
+			value = UsePolarCoordinates ? PolarValueFromPosition(coordinates) : CartesianValueFromPosition(coordinates);
 		}
 		
 		private void UpdateDragElementPosition(GeometryChangedEvent evt) => UpdateDragElementPosition();
 
 		private void UpdateDragElementPosition()
 		{
-			var position = IsWheel ? PositionFromPolarValue(value) : PositionFromCartesianValue(value);
+			var position = UsePolarCoordinates ? PositionFromPolarValue(value) : PositionFromCartesianValue(value);
 			DragHandle.style.left = Length.Percent(position.x * 100);
 			DragHandle.style.top = Length.Percent(position.y * 100);
 		}
@@ -89,20 +95,51 @@ namespace NiqonNO.UI
 			return coordinates;
 		}
 		
-
-		public void SetMaterial(Material drawerMaterial)
+		private StyleMaterialDefinition CreateMaterial(Shader pickerDrawerShader)
 		{
-			DragContainer.style.unityMaterial = new StyleMaterialDefinition(drawerMaterial);
+			if (pickerDrawerShader == null)
+			{
+				Debug.LogError($"Could not find shader with name {PickerDrawerShader}, material will not be created for {DragContainer.name} in {name} {nameof(NOColorPickerPlot)}");
+				return new StyleMaterialDefinition();
+			}
+
+			Keywords = new LocalKeyword[KeywordNames.Length];
+			for (var i = 0; i < KeywordNames.Length; i++) 
+				Keywords[i] = new LocalKeyword(pickerDrawerShader, KeywordNames[i]);
+
+			PickerSliderMaterial = new Material(pickerDrawerShader);
+			return new StyleMaterialDefinition(PickerSliderMaterial);
+		}
+		
+		public void SetPickerType(int pickerPlotType, bool usePolarCoordinates)
+		{
+			UsePolarCoordinates = usePolarCoordinates;
+			ApplyStyleClasses();
+			
+			if (PickerSliderMaterial.IsEmpty()) return;
+			for (var i = 0; i < Keywords.Length; i++)
+				PickerSliderMaterial.material.SetKeyword(Keywords[i], pickerPlotType == i);
 		}
 
-		private void UpdateCoordinateSystem()
+		public void SetMaterialOffset(Vector4 vector)
 		{
-			DragContainer.style.borderBottomLeftRadius = 
-				DragContainer.style.borderBottomRightRadius =
-					DragContainer.style.borderTopLeftRadius =
-						DragContainer.style.borderTopRightRadius = IsWheel ? Length.Percent(100) : Length.Percent(0);
-				
-			UpdateDragElementPosition();
+			if (PickerSliderMaterial.IsEmpty()) return;
+			PickerSliderMaterial.material.SetVector(EdgesOffsetShaderID, vector);
+		}
+		
+		public void SetMaterialProperty(float externalMaterialValue)
+		{
+			if (PickerSliderMaterial.IsEmpty()) return;
+			PickerSliderMaterial.material.SetFloat(ExternalShaderProperty, externalMaterialValue);
+		}
+		
+		private void ApplyStyleClasses()
+		{
+			EnableInClassList(NOUSS.ColorPickerPlotRoundClass, UsePolarCoordinates);
+			EnableInClassList(NOUSS.ColorPickerPlotSquareClass, !UsePolarCoordinates);
+
+			DragContainer.EnableInClassList(NOUSS.ColorPickerPlotDragAreaRoundClass, UsePolarCoordinates);
+			DragContainer.EnableInClassList(NOUSS.ColorPickerPlotDragAreaSquareClass, !UsePolarCoordinates);
 		}
 	}
 }

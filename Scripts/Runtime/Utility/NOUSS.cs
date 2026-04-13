@@ -20,6 +20,8 @@ namespace NiqonNO.UI
 		private const string PreviousModifier = "--previous";
 		private const string VerticalModifier = "--vertical";
 		private const string HorizontalModifier = "--horizontal";
+		private const string RoundModifier = "--round";
+		private const string SquareModifier = "--square";
 		
 		public const string TernaryStylePath = "uss_Ternary";
 		public const string TernaryClass = "ternary-slider";
@@ -40,7 +42,11 @@ namespace NiqonNO.UI
 		public const string ColorPickerLabelClass = ColorPickerClass + LabelSuffix;
 		public const string ColorPickerInputContainerClass = ColorPickerClass + InputSuffix;
 		public const string ColorPickerPlotClass = ColorPickerClass + "-plot";
+		public const string ColorPickerPlotRoundClass = ColorPickerPlotClass + RoundModifier;
+		public const string ColorPickerPlotSquareClass = ColorPickerPlotClass + SquareModifier;
 		public const string ColorPickerPlotDragAreaClass = ColorPickerPlotClass + DragAreaSuffix;
+		public const string ColorPickerPlotDragAreaRoundClass = ColorPickerPlotDragAreaClass + RoundModifier;
+		public const string ColorPickerPlotDragAreaSquareClass = ColorPickerPlotDragAreaClass + SquareModifier;
 		public const string ColorPickerPlotHandleClass = ColorPickerPlotClass + HandleSuffix;
 		public const string ColorPickerPlotPreviewClass = ColorPickerPlotClass + PreviewSuffix;
 		public const string ColorPickerSliderClass = ColorPickerClass + "-slider";

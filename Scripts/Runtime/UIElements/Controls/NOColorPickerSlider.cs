@@ -1,17 +1,26 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
 {
 	public class NOColorPickerSlider : Slider
 	{
+		private const string PickerDrawerShader = "Shader Graphs/shg_NO_UI_ColorSlider";
+		private static readonly string[] KeywordNames = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
+		private static readonly int HueShaderProperty = Shader.PropertyToID("_Hue");
+		private static Shader DrawerShader = Shader.Find(PickerDrawerShader);
+		
 		private VisualElement InputContainer;
 		private VisualElement DragContainer;
 		private VisualElement DragTracker;
 		private VisualElement DragHandle;
 		
-		public NOColorPickerSlider(SliderDirection direction)
-			: base(0, 1, direction)
+		private MaterialDefinition PickerSliderMaterial;
+		private LocalKeyword[] Keywords;
+		
+		public NOColorPickerSlider(SliderDirection direction) : this(direction, DrawerShader) { }
+		public NOColorPickerSlider(SliderDirection direction, Shader pickerDrawerShader) : base(0, 1, direction)
 		{
 			name = "color-slider-container";
 			AddToClassList(NOUSS.ColorPickerSliderClass);
@@ -24,6 +33,7 @@ namespace NiqonNO.UI
 			
 			DragTracker = this.Q(className: trackerUssClassName);
 			DragTracker.AddToClassList(NOUSS.ColorPickerSliderTrackerClass);
+			DragTracker.style.unityMaterial = CreateMaterial(pickerDrawerShader);
 			
 			DragHandle = this.Q(className: draggerUssClassName);
 			DragHandle.AddToClassList(NOUSS.ColorPickerSliderHandleClass);
@@ -34,9 +44,33 @@ namespace NiqonNO.UI
 			DragHandle.Add(element);
 		}
 		
-		public void SetMaterial(Material drawerMaterial)
+		private StyleMaterialDefinition CreateMaterial(Shader pickerDrawerShader)
 		{
-			DragTracker.style.unityMaterial = new StyleMaterialDefinition(drawerMaterial);
+			if (pickerDrawerShader == null)
+			{
+				Debug.LogError($"Could not find shader with name {PickerDrawerShader}, material will not be created for {DragContainer.name} in {name} {nameof(NOColorPickerSlider)}");
+				return new StyleMaterialDefinition();
+			}
+
+			Keywords = new LocalKeyword[KeywordNames.Length];
+			for (var i = 0; i < KeywordNames.Length; i++) 
+				Keywords[i] = new LocalKeyword(pickerDrawerShader, KeywordNames[i]);
+
+			PickerSliderMaterial = new Material(pickerDrawerShader);
+			return new StyleMaterialDefinition(PickerSliderMaterial);
+		}
+		
+		public void SetPickerType(int keyword)
+		{
+			if (PickerSliderMaterial.IsEmpty()) return;
+			for (var i = 0; i < Keywords.Length; i++)
+				PickerSliderMaterial.material.SetKeyword(Keywords[i], keyword == i);
+		}
+		
+		public void SetMaterialProperty(float hueMaterialValue)
+		{
+			if (PickerSliderMaterial.IsEmpty()) return;
+			PickerSliderMaterial.material.SetFloat(HueShaderProperty, hueMaterialValue);
 		}
 	}
 }
