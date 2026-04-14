@@ -6,10 +6,10 @@ namespace NiqonNO.UI
 {
 	public class NOColorPickerSlider : Slider
 	{
-		private const string PickerDrawerShader = "Shader Graphs/shg_NO_UI_ColorSlider";
+		private const string DrawerShaderName = "Shader Graphs/shg_NO_UI_ColorSlider";
 		private static readonly string[] KeywordNames = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
 		private static readonly int HueShaderProperty = Shader.PropertyToID("_Hue");
-		private static Shader DrawerShader = Shader.Find(PickerDrawerShader);
+		private static Shader DrawerShader = Shader.Find(DrawerShaderName);
 		
 		private VisualElement InputContainer;
 		private VisualElement DragContainer;
@@ -43,20 +43,29 @@ namespace NiqonNO.UI
 		{
 			DragHandle.Add(element);
 		}
-		
-		private StyleMaterialDefinition CreateMaterial(Shader pickerDrawerShader)
+
+		private StyleMaterialDefinition CreateMaterial(Shader shader)
 		{
-			if (pickerDrawerShader == null)
+			if (shader == null)
 			{
-				Debug.LogError($"Could not find shader with name {PickerDrawerShader}, material will not be created for {DragContainer.name} in {name} {nameof(NOColorPickerSlider)}");
-				return new StyleMaterialDefinition();
+				if (DrawerShader == null)
+				{
+					Debug.LogError(
+						$"Aborting material creation. Received null shader and fallback shader '{DrawerShaderName}' could not be resolved. " +
+						$"Target object: '{DragTracker?.name}' in '{name}' ({nameof(NOColorPickerSlider)}).");
+					return new StyleMaterialDefinition();
+				}
+				Debug.LogWarning(
+					$"Received null shader. Falling back to default shader '{DrawerShaderName}'. " +
+					$"Target object: '{DragTracker?.name}' in '{name}' ({nameof(NOColorPickerSlider)}).");
+				shader = DrawerShader;
 			}
 
 			Keywords = new LocalKeyword[KeywordNames.Length];
 			for (var i = 0; i < KeywordNames.Length; i++) 
-				Keywords[i] = new LocalKeyword(pickerDrawerShader, KeywordNames[i]);
+				Keywords[i] = new LocalKeyword(shader, KeywordNames[i]);
 
-			PickerSliderMaterial = new Material(pickerDrawerShader);
+			PickerSliderMaterial = new Material(shader);
 			return new StyleMaterialDefinition(PickerSliderMaterial);
 		}
 		

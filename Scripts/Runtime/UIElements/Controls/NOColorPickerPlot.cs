@@ -8,18 +8,20 @@ namespace NiqonNO.UI
 {
 	public class NOColorPickerPlot : BaseField<Vector2>
 	{
-		private const string PickerDrawerShader = "Shader Graphs/shg_NO_UI_ColorWheel";
+		private const string DrawerShaderName = "Shader Graphs/shg_NO_UI_ColorWheel";
 		private static readonly string[] KeywordNames = { "_COLOR_PICKER_TYPE_LS_H", "_COLOR_PICKER_TYPE_HL_S", "_COLOR_PICKER_TYPE_HS_L" };
 		private static readonly int EdgesOffsetShaderID = Shader.PropertyToID("_Wheel_Edges_Offset");
 		private static readonly int ExternalShaderProperty = Shader.PropertyToID("_External");
-		private static readonly Shader DrawerShader = Shader.Find(PickerDrawerShader);
+		private static readonly Shader DrawerShader = Shader.Find(DrawerShaderName);
 		
 		private VisualElement DragContainer;
 		private VisualElement DragHandle;
 
-		private bool UsePolarCoordinates;
 		private MaterialDefinition PickerSliderMaterial;
 		private LocalKeyword[] Keywords;
+
+		private bool UsePolarCoordinates;
+		private Vector2 Offests = Vector2.up;
 
 		public NOColorPickerPlot() : this(DrawerShader) { }
 		public NOColorPickerPlot(Shader pickerDrawerShader) : base(string.Empty, new VisualElement())
@@ -49,6 +51,8 @@ namespace NiqonNO.UI
 		
 		public override void SetValueWithoutNotify(Vector2 newValue)
 		{
+			if(UsePolarCoordinates)
+				newValue.x = NOMath.Remap(newValue.x, 0, 1, Offests.x, Offests.y);
 			base.SetValueWithoutNotify(newValue);
 			UpdateDragElementPosition();
 		}
@@ -73,6 +77,7 @@ namespace NiqonNO.UI
 		}
 		private Vector2 PositionFromCartesianValue(Vector2 cartesianValue)
 		{
+			cartesianValue = cartesianValue.Clamp(0, 1);
 			return new Vector2(cartesianValue.x, 1 - cartesianValue.y);
 		}
 
@@ -87,6 +92,13 @@ namespace NiqonNO.UI
 		}
 		private Vector2 PositionFromPolarValue(Vector2 polarValue)
 		{
+			polarValue.x = polarValue.x switch
+			{
+				< 0f => Mathf.Pow(polarValue.x + 1f, 3f) - 1f,
+				> 1f => 1 - Mathf.Pow(1f - (polarValue.x - 1f), 3f) + 1f,
+				_ => polarValue.x
+			};
+			polarValue.x = NOMath.Remap(polarValue.x, Offests.x, Offests.y, 0, 1);
 			polarValue.y *= Mathf.PI * 2f;
 			Vector2 coordinates = Polar.FromVector2(polarValue).ToCartesian();
 			coordinates.x = 1.0f - (0.5f + 0.5f * coordinates.x);
@@ -95,19 +107,28 @@ namespace NiqonNO.UI
 			return coordinates;
 		}
 		
-		private StyleMaterialDefinition CreateMaterial(Shader pickerDrawerShader)
+		private StyleMaterialDefinition CreateMaterial(Shader shader)
 		{
-			if (pickerDrawerShader == null)
+			if (shader == null)
 			{
-				Debug.LogError($"Could not find shader with name {PickerDrawerShader}, material will not be created for {DragContainer.name} in {name} {nameof(NOColorPickerPlot)}");
-				return new StyleMaterialDefinition();
+				if (DrawerShader == null)
+				{
+					Debug.LogError(
+						$"Aborting material creation. Received null shader and fallback shader '{DrawerShaderName}' could not be resolved. " +
+						$"Target object: '{DragContainer?.name}' in '{name}' ({nameof(NOColorPickerPlot)}).");
+					return new StyleMaterialDefinition();
+				}
+				Debug.LogWarning(
+					$"Received null shader. Falling back to default shader '{DrawerShaderName}'. " +
+					$"Target object: '{DragContainer?.name}' in '{name}' ({nameof(NOColorPickerPlot)}).");
+				shader = DrawerShader;
 			}
 
 			Keywords = new LocalKeyword[KeywordNames.Length];
 			for (var i = 0; i < KeywordNames.Length; i++) 
-				Keywords[i] = new LocalKeyword(pickerDrawerShader, KeywordNames[i]);
+				Keywords[i] = new LocalKeyword(shader, KeywordNames[i]);
 
-			PickerSliderMaterial = new Material(pickerDrawerShader);
+			PickerSliderMaterial = new Material(shader);
 			return new StyleMaterialDefinition(PickerSliderMaterial);
 		}
 		
@@ -121,10 +142,11 @@ namespace NiqonNO.UI
 				PickerSliderMaterial.material.SetKeyword(Keywords[i], pickerPlotType == i);
 		}
 
-		public void SetMaterialOffset(Vector4 vector)
+		public void SetMaterialOffset(Vector2 offset)
 		{
+			Offests = offset;
 			if (PickerSliderMaterial.IsEmpty()) return;
-			PickerSliderMaterial.material.SetVector(EdgesOffsetShaderID, vector);
+			PickerSliderMaterial.material.SetVector(EdgesOffsetShaderID, offset);
 		}
 		
 		public void SetMaterialProperty(float externalMaterialValue)
