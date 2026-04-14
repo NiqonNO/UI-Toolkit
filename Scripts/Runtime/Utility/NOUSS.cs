@@ -73,6 +73,11 @@ namespace NiqonNO.UI
 		public const string ToggleSelectorContentContainerHorizontalClass = ToggleSelectorContentContainerClass + HorizontalModifier;
 		public const string ToggleSelectorTile = ItemSelectorClass + TileSuffix;
 
-		public static StyleSheet GetStyleSheet(string path) => Resources.Load<StyleSheet>(path);
+		public static void TryToApplyStyle(VisualElement element, string path)
+		{
+			StyleSheet style = Resources.Load<StyleSheet>(path);
+			if(style == null) return;
+			element.styleSheets.Insert(0, style);
+		}
 	}
 }

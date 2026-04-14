@@ -105,7 +105,7 @@ namespace NiqonNO.UI
             _AutoScrollEase = centeringEase;
             _AutoScrollDuration = centeringDuration;
 
-            styleSheets.Add(NOUSS.GetStyleSheet(NOUSS.ToggleSelectorStylePath));
+            NOUSS.TryToApplyStyle(this, NOUSS.ToggleSelectorStylePath);
             AddToClassList(NOUSS.ItemSelectorClass);
 
             if (!string.IsNullOrEmpty(label))

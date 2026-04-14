@@ -74,9 +74,7 @@ namespace NiqonNO.UI
 		public NOColorPicker() : this(string.Empty) { }
 		public NOColorPicker(string label) : base(label, new VisualElement())
 		{
-			var styleSheet = NOUSS.GetStyleSheet(NOUSS.ColorPickerStylePath);
-			if(styleSheet) styleSheets.Add(styleSheet);
-
+			NOUSS.TryToApplyStyle(this, NOUSS.ColorPickerStylePath);
 			AddToClassList(NOUSS.ColorPickerClass);
 			labelElement.AddToClassList(NOUSS.ColorPickerLabelClass);
 

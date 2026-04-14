@@ -25,9 +25,7 @@ namespace NiqonNO.UI
 
 		public NOTernarySlider(string label) : base(label, new VisualElement())
 		{
-			var styleSheet = NOUSS.GetStyleSheet(NOUSS.TernaryStylePath);
-			if(styleSheet) styleSheets.Add(styleSheet);
-			
+			NOUSS.TryToApplyStyle(this, NOUSS.TernaryStylePath);
 			AddToClassList(NOUSS.TernaryClass);
 			labelElement.AddToClassList(NOUSS.TernaryLabelClass);
 			

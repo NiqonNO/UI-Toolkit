@@ -26,9 +26,7 @@ namespace NiqonNO.UI
 
 		public NOQuaternarySlider(string label) : base(label, new VisualElement())
 		{
-			var styleSheet = NOUSS.GetStyleSheet(NOUSS.QuaternaryStylePath);
-			if(styleSheet) styleSheets.Add(styleSheet);
-
+			NOUSS.TryToApplyStyle(this, NOUSS.QuaternaryStylePath);
 			AddToClassList(NOUSS.QuaternaryClass);
 			labelElement.AddToClassList(NOUSS.QuaternaryLabelClass);
 
