@@ -9,7 +9,7 @@ namespace NiqonNO.UI
 	[UxmlElement]
 	public partial class NOColorPicker : BaseField<Vector3>
 	{
-		private static readonly BindingId colorProperty = (BindingId) nameof (ColorValue);
+		private static readonly BindingId ColorProperty = (BindingId) nameof (ColorValue);
 		
 		private readonly VisualElement InputContainer;
 		private readonly NOColorPickerPlot PickerPlot;
@@ -27,9 +27,20 @@ namespace NiqonNO.UI
 				if (value == _ColorValue) return;
 				_ColorValue = value;
 				SetHSV(_ColorValue);
+				NotifyPropertyChanged(ColorProperty);
 			}
 		}
-		
+		private Color RawColorValue
+		{
+			get => _ColorValue;
+			set
+			{
+				if (value == _ColorValue) return;
+				_ColorValue = value;
+				NotifyPropertyChanged(ColorProperty);
+			}
+		}
+
 		private ColorPickerType _PickerPlotType;
 		[UxmlAttribute, CreateProperty]
 		private ColorPickerType PickerPlotType
@@ -38,15 +49,15 @@ namespace NiqonNO.UI
 			set
 			{
 				if (value == _PickerPlotType) return;
-				Vector3 HSV = this.value;
+				Vector3 hsv = this.value;
 				_PickerPlotType = value;
 				SetPickerType();
-				SetHSV(HSV);
+				SetHSV(hsv);
 			}
 		}
 
-		private Vector2 _EdgesOffset;
-		[UxmlAttribute, CreateProperty, MinMaxSlider(0, 1, true), ShowIf(nameof(IsColorWheel))]
+		private Vector2 _EdgesOffset = Vector2.up;
+		[UxmlAttribute, CreateProperty/*, MinMaxSlider(0, 1, true), ShowIf(nameof(IsColorWheel))*/]
 		private Vector2 EdgesOffset
 		{
 			get => _EdgesOffset;
@@ -94,6 +105,14 @@ namespace NiqonNO.UI
 		}
 
 		Color GetHSVColor() => Color.HSVToRGB(Mathf.Clamp01(value.x), Mathf.Clamp01(value.y), Mathf.Clamp01(value.z));
+		Color GetHSVSliderColor() => PickerPlotType switch
+		{
+			ColorPickerType.ValueSaturation_Hue => Color.HSVToRGB(Mathf.Clamp01(value.x), 1.0f, 1.0f),
+			ColorPickerType.HueValue_Saturation => Color.HSVToRGB(Mathf.Clamp01(value.x), Mathf.Clamp01(value.y), 1.0f),
+			ColorPickerType.HueSaturation_Value => Color.HSVToRGB(Mathf.Clamp01(value.x), 1.0f, Mathf.Clamp01(value.z)),
+			_ => GetHSVColor()
+		};
+		
 		Vector3 GetHSV() => PickerPlotType switch
 		{
 			ColorPickerType.ValueSaturation_Hue => new Vector3(PickerSlider.value, PickerPlot.value.x, PickerPlot.value.y),
@@ -179,10 +198,9 @@ namespace NiqonNO.UI
 		{
 			base.SetValueWithoutNotify(newValue);
 
-			_ColorValue = GetHSVColor();
-			NotifyPropertyChanged(colorProperty);
-			PickerColorPreview.style.backgroundColor = new StyleColor(ColorValue);
-			SliderColorPreview.style.backgroundColor = new StyleColor(ColorValue);
+			RawColorValue = GetHSVColor();
+			PickerColorPreview.style.backgroundColor = new StyleColor(RawColorValue);
+			SliderColorPreview.style.backgroundColor = new StyleColor(GetHSVSliderColor());
 		}
 
 		[Serializable]

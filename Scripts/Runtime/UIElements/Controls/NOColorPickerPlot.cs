@@ -77,8 +77,7 @@ namespace NiqonNO.UI
 		}
 		private Vector2 PositionFromCartesianValue(Vector2 cartesianValue)
 		{
-			cartesianValue = cartesianValue.Clamp(0, 1);
-			return new Vector2(cartesianValue.x, 1 - cartesianValue.y);
+			return new Vector2(Mathf.Clamp01(cartesianValue.x), 1 - Mathf.Clamp01(cartesianValue.y));
 		}
 
 		private Vector2 PolarValueFromPosition(Vector2 coordinates)
