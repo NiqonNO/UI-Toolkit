@@ -27,9 +27,7 @@ namespace NiqonNO.UI
 			
 			Dropdown = new DropdownField(categories, categories[0]) { name = "category-dropdown" };
 			Dropdown.AddToClassList(NOUSS.MultiCategoryScrollViewDropdownClass);
-			Dropdown.RegisterCallback<ChangeEvent<int>>(OnDropdownValueChanged);
-			Dropdown.RegisterCallback<ChangeEvent<string>>(OnDropdownValueStringChanged);
-			Dropdown.RegisterValueChangedCallback(OnDropdownValueChangedTest2);
+			Dropdown.RegisterCallback<ChangeEvent<string>>(OnDropdownValueChanged);
 
 			Category.Add(Dropdown);
 			Category.Add(ScrollerViewport);
@@ -42,18 +40,9 @@ namespace NiqonNO.UI
 			ScrollerViewport.Add(element);
 		}
 		
-		private void OnDropdownValueChanged(ChangeEvent<int> evt)
-		{
-			Debug.Log($"[NOMultiCategoryScrollView] {Dropdown.choices[evt.newValue]}");
-		}
-		
-		private void OnDropdownValueStringChanged(ChangeEvent<string> evt)
+		private void OnDropdownValueChanged(ChangeEvent<string> evt)
 		{
 			Debug.Log($"[NOMultiCategoryScrollView] 1 - {evt.newValue} {Dropdown.index} - {Dropdown.choices[Dropdown.index]}");
-		}
-		private void OnDropdownValueChangedTest2(ChangeEvent<string> evt)
-		{
-			Debug.Log($"[NOMultiCategoryScrollView] 2 - {evt.newValue} {Dropdown.index} - {Dropdown.choices[Dropdown.index]}");
 		}
 	}
 }

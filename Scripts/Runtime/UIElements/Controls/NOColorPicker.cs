@@ -115,24 +115,18 @@ namespace NiqonNO.UI
 			Color.RGBToHSV(ColorValue, out hsv.x, out hsv.y, out hsv.z);
 			switch (PickerPlotType)
 			{
-				case ColorPickerType.HueSaturation_Value:
-					if(hsv.z == 0)
-					{
-						hsv.z = -_EdgesOffset.x;
-						hsv.y = 1;
-					}
-					UpdateSliders(hsv.z, hsv.y, hsv.x);
+				case ColorPickerType.ValueSaturation_Hue:
+					UpdateSliders(hsv.x, hsv.y, hsv.z);
 					break;
 				case ColorPickerType.HueValue_Saturation:
-					if(hsv.y == 0)
+					if(hsv.z == 0)
 					{
-						hsv.y = -_EdgesOffset.x;
-						hsv.z = 1;
+						hsv.y = 1;
 					}
 					UpdateSliders(hsv.y, hsv.z, hsv.x);
 					break;
-				default:
-					UpdateSliders(hsv.x, hsv.y, hsv.z);
+				case ColorPickerType.HueSaturation_Value:
+					UpdateSliders(hsv.z, hsv.y, hsv.x);
 					break;
 			}
 		}
