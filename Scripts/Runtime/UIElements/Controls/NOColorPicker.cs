@@ -70,7 +70,7 @@ namespace NiqonNO.UI
 		
 		private bool IsColorWheel => PickerPlotType != ColorPickerType.ValueSaturation_Hue;
 		
-		public NOColorPicker(Color colorValue, ColorPickerType plotType, Vector2 edgesOffset) : 
+		public NOColorPicker(Color colorValue, Vector2 edgesOffset, ColorPickerType plotType) : 
 			this(string.Empty, edgesOffset, colorValue, plotType) { }
 		public NOColorPicker() : this(string.Empty, Vector2.up) { }
 		public NOColorPicker(string label, Vector2 edgesOffset,
@@ -79,19 +79,6 @@ namespace NiqonNO.UI
 			_ColorValue = colorValue;
 			_PickerPlotType = plotType;
 			_EdgesOffset = edgesOffset;
-
-			Vector3 hsv;
-			Color.RGBToHSV(colorValue, out hsv.x, out hsv.y, out hsv.z);
-			switch (plotType)
-			{
-				case ColorPickerType.HueSaturation_Value:
-					if (hsv.z == 0) hsv.y = 1;
-					break;
-				case ColorPickerType.HueValue_Saturation:
-					if (hsv.y == 0) hsv.z = 1;
-					break;
-			}
-			rawValue = hsv;
 			
 			NOUSS.TryToApplyStyle(this, NOUSS.ColorPickerStylePath);
 			AddToClassList(NOUSS.ColorPickerClass);
@@ -119,8 +106,37 @@ namespace NiqonNO.UI
 
 			SetPickerType();
 			SetEdgesOffset();
+			InitializeHSVValues();
 		}
 
+		void InitializeHSVValues()
+		{
+			Vector3 hsv;
+			Color.RGBToHSV(ColorValue, out hsv.x, out hsv.y, out hsv.z);
+			switch (PickerPlotType)
+			{
+				case ColorPickerType.HueSaturation_Value:
+					if(hsv.z == 0)
+					{
+						hsv.z = -_EdgesOffset.x;
+						hsv.y = 1;
+					}
+					UpdateSliders(hsv.z, hsv.y, hsv.x);
+					break;
+				case ColorPickerType.HueValue_Saturation:
+					if(hsv.y == 0)
+					{
+						hsv.y = -_EdgesOffset.x;
+						hsv.z = 1;
+					}
+					UpdateSliders(hsv.y, hsv.z, hsv.x);
+					break;
+				default:
+					UpdateSliders(hsv.x, hsv.y, hsv.z);
+					break;
+			}
+		}
+		
 		Color GetHSVColor() => Color.HSVToRGB(Mathf.Clamp01(value.x), Mathf.Clamp01(value.y), Mathf.Clamp01(value.z));
 		Color GetHSVSliderColor() => PickerPlotType switch
 		{
