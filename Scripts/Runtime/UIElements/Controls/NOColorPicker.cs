@@ -1,5 +1,4 @@
 using System;
-using Sirenix.OdinInspector;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -71,9 +70,29 @@ namespace NiqonNO.UI
 		
 		private bool IsColorWheel => PickerPlotType != ColorPickerType.ValueSaturation_Hue;
 		
-		public NOColorPicker() : this(string.Empty) { }
-		public NOColorPicker(string label) : base(label, new VisualElement())
+		public NOColorPicker(Color colorValue, ColorPickerType plotType, Vector2 edgesOffset) : 
+			this(string.Empty, edgesOffset, colorValue, plotType) { }
+		public NOColorPicker() : this(string.Empty, Vector2.up) { }
+		public NOColorPicker(string label, Vector2 edgesOffset,
+			Color colorValue = default, ColorPickerType plotType = ColorPickerType.ValueSaturation_Hue) : base(label, new VisualElement())
 		{
+			_ColorValue = colorValue;
+			_PickerPlotType = plotType;
+			_EdgesOffset = edgesOffset;
+
+			Vector3 hsv;
+			Color.RGBToHSV(colorValue, out hsv.x, out hsv.y, out hsv.z);
+			switch (plotType)
+			{
+				case ColorPickerType.HueSaturation_Value:
+					if (hsv.z == 0) hsv.y = 1;
+					break;
+				case ColorPickerType.HueValue_Saturation:
+					if (hsv.y == 0) hsv.z = 1;
+					break;
+			}
+			rawValue = hsv;
+			
 			NOUSS.TryToApplyStyle(this, NOUSS.ColorPickerStylePath);
 			AddToClassList(NOUSS.ColorPickerClass);
 			labelElement.AddToClassList(NOUSS.ColorPickerLabelClass);

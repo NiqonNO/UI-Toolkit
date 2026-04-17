@@ -8,13 +8,17 @@ namespace NiqonNO.UI
 		private const string LabelSuffix = "__label";
 		private const string ButtonSuffix = "__button";
 		private const string InputSuffix = "__input-container";
-		private const string ContentSuffix = "__content-container";
+		private const string ViewportContainerSuffix = "__viewport-container";
 		private const string ViewportSuffix = "__viewport";
+		private const string ContentContainerSuffix = "__content-container";
+		private const string ContentSuffix = "__content";
 		private const string TrackerSuffix = "__tracker";
 		private const string HandleSuffix = "__handle";
 		private const string DragAreaSuffix = "__drag-area";
 		private const string TileSuffix = "__tile";
 		private const string PreviewSuffix = "__preview";
+		private const string CategorySuffix = "__category";
+		private const string DropdownSuffix = "__dropdown";
 		
 		private const string NextModifier = "--next";
 		private const string PreviousModifier = "--previous";
@@ -68,10 +72,17 @@ namespace NiqonNO.UI
 		public const string ToggleSelectorViewportClass = ItemSelectorClass + ViewportSuffix;
 		public const string ToggleSelectorViewportVerticalClass = ToggleSelectorViewportClass + VerticalModifier;
 		public const string ToggleSelectorViewportHorizontalClass = ToggleSelectorViewportClass + HorizontalModifier;
-		public const string ToggleSelectorContentContainerClass = ItemSelectorClass + ContentSuffix;
+		public const string ToggleSelectorContentContainerClass = ItemSelectorClass + ContentContainerSuffix;
 		public const string ToggleSelectorContentContainerVerticalClass = ToggleSelectorContentContainerClass + VerticalModifier;
 		public const string ToggleSelectorContentContainerHorizontalClass = ToggleSelectorContentContainerClass + HorizontalModifier;
 		public const string ToggleSelectorTile = ItemSelectorClass + TileSuffix;
+		
+		public const string MultiCategoryScrollViewStylePath = "uss_Multi Scroll View";
+		public const string MultiCategoryScrollViewClass = "multi-scroll-view";
+		public const string MultiCategoryScrollViewCategoryClass = MultiCategoryScrollViewClass + CategorySuffix;
+		public const string MultiCategoryScrollViewDropdownClass = MultiCategoryScrollViewClass + DropdownSuffix;
+		public const string MultiCategoryScrollViewContentListViewportClass = MultiCategoryScrollViewClass + ViewportContainerSuffix;
+		public const string MultiCategoryScrollViewContentListContentClass = MultiCategoryScrollViewClass + ContentContainerSuffix;
 
 		public static void TryToApplyStyle(VisualElement element, string path)
 		{
