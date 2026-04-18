@@ -22,7 +22,6 @@ namespace NiqonNO.UI
 		public NOColorPickerSlider(SliderDirection direction) : this(direction, DrawerShader) { }
 		public NOColorPickerSlider(SliderDirection direction, Shader pickerDrawerShader) : base(0, 1, direction)
 		{
-			name = "color-slider-container";
 			AddToClassList(NOUSS.ColorPickerSliderClass);
 
 			InputContainer = this.Q(className: inputUssClassName);

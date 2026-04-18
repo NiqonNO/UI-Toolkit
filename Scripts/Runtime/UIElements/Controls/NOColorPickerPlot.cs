@@ -26,10 +26,9 @@ namespace NiqonNO.UI
 		public NOColorPickerPlot() : this(DrawerShader) { }
 		public NOColorPickerPlot(Shader pickerDrawerShader) : base(string.Empty, new VisualElement())
 		{
-			name = "color-picker-container";
 			AddToClassList(NOUSS.ColorPickerPlotClass);
 			
-			DragHandle = new VisualElement { name = "color-picker-drag-handle", usageHints = UsageHints.DynamicTransform, };
+			DragHandle = new VisualElement { name = "color-picker-plot__drag-handle", usageHints = UsageHints.DynamicTransform, };
 			DragHandle.AddToClassList(NOUSS.ColorPickerPlotHandleClass);
 			DragHandle.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 			

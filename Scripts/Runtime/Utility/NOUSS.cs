@@ -5,46 +5,52 @@ namespace NiqonNO.UI
 {
 	public static class NOUSS
 	{
-		private const string LabelSuffix = "__label";
-		private const string ButtonSuffix = "__button";
-		private const string InputSuffix = "__input-container";
-		private const string ViewportContainerSuffix = "__viewport-container";
-		private const string ViewportSuffix = "__viewport";
-		private const string ContentContainerSuffix = "__content-container";
-		private const string ContentSuffix = "__content";
-		private const string TrackerSuffix = "__tracker";
-		private const string HandleSuffix = "__handle";
-		private const string DragAreaSuffix = "__drag-area";
-		private const string TileSuffix = "__tile";
-		private const string PreviewSuffix = "__preview";
-		private const string CategorySuffix = "__category";
-		private const string DropdownSuffix = "__dropdown";
+		public const string LabelSuffix = "__label";
+		public const string ButtonSuffix = "__button";
+		public const string IconSuffix = "__icon";
+		public const string InputSuffix = "__input";
+		public const string ViewportSuffix = "__viewport";
+		public const string ContentSuffix = "__content";
+		public const string HeaderSuffix = "__header";
+		public const string TrackerSuffix = "__tracker";
+		public const string HandleSuffix = "__handle";
+		public const string DragAreaSuffix = "__drag-area";
+		public const string TileSuffix = "__tile";
+		public const string PreviewSuffix = "__preview";
+		public const string CategorySuffix = "__category";
+		public const string DropdownSuffix = "__dropdown";
+		public const string BorderSuffix = "__border";
 		
-		private const string NextModifier = "--next";
-		private const string PreviousModifier = "--previous";
-		private const string VerticalModifier = "--vertical";
-		private const string HorizontalModifier = "--horizontal";
-		private const string RoundModifier = "--round";
-		private const string SquareModifier = "--square";
+		public const string Container = "-container";
+		public const string Space = "--";
+		
+		public const string NextModifier = "--next";
+		public const string PreviousModifier = "--previous";
+		public const string VerticalModifier = "--vertical";
+		public const string HorizontalModifier = "--horizontal";
+		public const string RoundModifier = "--round";
+		public const string SquareModifier = "--square";
+		public const string OpenModifier = "--open";
+		public const string EndModifier = "--close";
 		
 		public const string TernaryStylePath = "uss_Ternary";
 		public const string TernaryClass = "ternary-slider";
 		public const string TernaryLabelClass = TernaryClass + LabelSuffix;
-		public const string TernaryInputContainerClass = TernaryClass + InputSuffix;
+		public const string TernaryInputContainerClass = TernaryClass + InputSuffix + Container;
 		public const string TernaryDragAreaClass = TernaryClass + DragAreaSuffix;
 		public const string TernaryHandleClass = TernaryClass + HandleSuffix;
 		
 		public const string QuaternaryStylePath = "uss_Quaternary";
 		public const string QuaternaryClass = "quaternary-slider";
 		public const string QuaternaryLabelClass = QuaternaryClass + LabelSuffix;
-		public const string QuaternaryInputContainerClass = QuaternaryClass + InputSuffix;
+		public const string QuaternaryInputContainerClass = QuaternaryClass + InputSuffix + Container;
 		public const string QuaternaryDragAreaClass = QuaternaryClass + DragAreaSuffix;
 		public const string QuaternaryHandleClass = QuaternaryClass + HandleSuffix;
 		
 		public const string ColorPickerStylePath = "uss_Color Picker";
 		public const string ColorPickerClass = "color-picker";
 		public const string ColorPickerLabelClass = ColorPickerClass + LabelSuffix;
-		public const string ColorPickerInputContainerClass = ColorPickerClass + InputSuffix;
+		public const string ColorPickerInputContainerClass = ColorPickerClass + InputSuffix + Container;
 		public const string ColorPickerPlotClass = ColorPickerClass + "-plot";
 		public const string ColorPickerPlotRoundClass = ColorPickerPlotClass + RoundModifier;
 		public const string ColorPickerPlotSquareClass = ColorPickerPlotClass + SquareModifier;
@@ -54,7 +60,7 @@ namespace NiqonNO.UI
 		public const string ColorPickerPlotHandleClass = ColorPickerPlotClass + HandleSuffix;
 		public const string ColorPickerPlotPreviewClass = ColorPickerPlotClass + PreviewSuffix;
 		public const string ColorPickerSliderClass = ColorPickerClass + "-slider";
-		public const string ColorPickerSliderInputContainerClass = ColorPickerSliderClass + InputSuffix;
+		public const string ColorPickerSliderInputContainerClass = ColorPickerSliderClass + InputSuffix + Container;
 		public const string ColorPickerSliderDragAreaClass = ColorPickerSliderClass + DragAreaSuffix;
 		public const string ColorPickerSliderTrackerClass = ColorPickerSliderClass + TrackerSuffix;
 		public const string ColorPickerSliderHandleClass = ColorPickerSliderClass + HandleSuffix;
@@ -63,7 +69,7 @@ namespace NiqonNO.UI
 		public const string ToggleSelectorStylePath = "uss_Item Selector";
 		public const string ItemSelectorClass = "toggle-selector";
 		public const string ToggleSelectorLabelClass = ItemSelectorClass + LabelSuffix;
-		public const string ToggleSelectorInputContainerClass = ItemSelectorClass + InputSuffix;
+		public const string ToggleSelectorInputContainerClass = ItemSelectorClass + InputSuffix + Container;
 		public const string ToggleSelectorInputContainerVerticalClass = ToggleSelectorInputContainerClass + VerticalModifier;
 		public const string ToggleSelectorInputContainerHorizontalClass = ToggleSelectorInputContainerClass + HorizontalModifier;
 		public const string ToggleSelectorButtonClass = ItemSelectorClass + ButtonSuffix;
@@ -72,7 +78,7 @@ namespace NiqonNO.UI
 		public const string ToggleSelectorViewportClass = ItemSelectorClass + ViewportSuffix;
 		public const string ToggleSelectorViewportVerticalClass = ToggleSelectorViewportClass + VerticalModifier;
 		public const string ToggleSelectorViewportHorizontalClass = ToggleSelectorViewportClass + HorizontalModifier;
-		public const string ToggleSelectorContentContainerClass = ItemSelectorClass + ContentContainerSuffix;
+		public const string ToggleSelectorContentContainerClass = ItemSelectorClass + ContentSuffix + Container;
 		public const string ToggleSelectorContentContainerVerticalClass = ToggleSelectorContentContainerClass + VerticalModifier;
 		public const string ToggleSelectorContentContainerHorizontalClass = ToggleSelectorContentContainerClass + HorizontalModifier;
 		public const string ToggleSelectorTile = ItemSelectorClass + TileSuffix;
@@ -81,8 +87,8 @@ namespace NiqonNO.UI
 		public const string MultiCategoryScrollViewClass = "multi-scroll-view";
 		public const string MultiCategoryScrollViewCategoryClass = MultiCategoryScrollViewClass + CategorySuffix;
 		public const string MultiCategoryScrollViewDropdownClass = MultiCategoryScrollViewClass + DropdownSuffix;
-		public const string MultiCategoryScrollViewContentListViewportClass = MultiCategoryScrollViewClass + ViewportContainerSuffix;
-		public const string MultiCategoryScrollViewContentListContentClass = MultiCategoryScrollViewClass + ContentContainerSuffix;
+		public const string MultiCategoryScrollViewContentListViewportClass = MultiCategoryScrollViewClass + ViewportSuffix + Container;
+		public const string MultiCategoryScrollViewContentListContentClass = MultiCategoryScrollViewClass + ContentSuffix + Container;
 
 		public static void TryToApplyStyle(VisualElement element, string path)
 		{

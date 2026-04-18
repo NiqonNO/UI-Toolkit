@@ -33,12 +33,12 @@ namespace NiqonNO.UI
 			InputContainer = this.Q(className: inputUssClassName);
 			InputContainer.AddToClassList(NOUSS.QuaternaryInputContainerClass);
 
-			DragHandle = new VisualElement { name = "quaternary-drag-handle", usageHints = UsageHints.DynamicTransform };
+			DragHandle = new VisualElement { name = "quaternary__drag-handle", usageHints = UsageHints.DynamicTransform };
 			DragHandle.AddToClassList(NOUSS.QuaternaryHandleClass);
 			DragHandle.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 
 			var dragger = new NOMultiDimensionDragger(DragHandle, SetValueFromCoordinates);
-			DragContainer = new VisualElement { name = "quaternary-drag-area", };
+			DragContainer = new VisualElement { name = "quaternary__drag-area", };
 			DragContainer.AddToClassList(NOUSS.QuaternaryDragAreaClass);
 			DragContainer.RegisterCallback<GeometryChangedEvent>(UpdateDragElementPosition);
 			DragContainer.AddManipulator(dragger);

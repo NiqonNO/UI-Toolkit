@@ -118,21 +118,21 @@ namespace NiqonNO.UI
             InputContainer = new VisualElement();
             InputContainer.AddToClassList(NOUSS.ToggleSelectorInputContainerClass);
 
-            ContentViewport = new VisualElement { name = "toggle-selector-content-viewport", pickingMode = PickingMode.Ignore, };
+            ContentViewport = new VisualElement { name = "toggle-selector__content-viewport", pickingMode = PickingMode.Ignore, };
             ContentViewport.AddToClassList(NOUSS.ToggleSelectorViewportClass);
             ContentViewport.RegisterCallback<GeometryChangedEvent>(OnViewportGeometryChanged);
 
             ScrollerManipulator = new NOContentScroller(JumpNext, JumpPrevious, TilePixelSize, scrollDirection, centeringEase, centeringDuration);
-            ContentContainer = new VisualElement { name = "toggle-selector-content-container", usageHints = UsageHints.GroupTransform };
+            ContentContainer = new VisualElement { name = "toggle-selector__content-container", usageHints = UsageHints.GroupTransform };
             ContentContainer.AddToClassList(NOUSS.ToggleSelectorContentContainerClass);
             ContentContainer.RegisterCallback<GeometryChangedEvent>(OnContainerGeometryChanged);
             ContentContainer.AddManipulator(ScrollerManipulator);
 
-            PreviousButton = new Button(ScrollerManipulator.ScrollToPrevious) { name = "toggle-selector-previous", };
+            PreviousButton = new Button(ScrollerManipulator.ScrollToPrevious) { name = "toggle-selector__previous", };
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             PreviousButton.AddToClassList(NOUSS.ToggleSelectorButtonPreviousClass);
 
-            NextButton = new Button(ScrollerManipulator.ScrollToNext) { name = "toggle-selector-next", };
+            NextButton = new Button(ScrollerManipulator.ScrollToNext) { name = "toggle-selector__next", };
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonClass);
             NextButton.AddToClassList(NOUSS.ToggleSelectorButtonNextClass);
 

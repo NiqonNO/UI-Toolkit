@@ -19,13 +19,13 @@ namespace NiqonNO.UI
 			Category = contentViewport;
 			Category.AddToClassList(NOUSS.MultiCategoryScrollViewCategoryClass);
 
-			ScrollerViewport = new VisualElement() { name = "preset-scroller-viewport" };
+			ScrollerViewport = new VisualElement() { name = "preset-scroller__viewport" };
 			ScrollerViewport.AddToClassList(NOUSS.MultiCategoryScrollViewContentListViewportClass);
 			
-			ScrollerContainer = new VisualElement() { name = "preset-scroller-content" };
+			ScrollerContainer = new VisualElement() { name = "preset-scroller__content" };
 			ScrollerContainer.AddToClassList(NOUSS.MultiCategoryScrollViewContentListContentClass);
 			
-			Dropdown = new DropdownField(categories, categories[0]) { name = "category-dropdown" };
+			Dropdown = new DropdownField(categories, categories[0]) { name = "preset-scroller__category-dropdown" };
 			Dropdown.AddToClassList(NOUSS.MultiCategoryScrollViewDropdownClass);
 			Dropdown.RegisterCallback<ChangeEvent<string>>(OnDropdownValueChanged);
 

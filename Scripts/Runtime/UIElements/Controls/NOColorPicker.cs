@@ -87,16 +87,16 @@ namespace NiqonNO.UI
 			InputContainer = this.Q(className: inputUssClassName);
 			InputContainer.AddToClassList(NOUSS.ColorPickerInputContainerClass);
 			
-			PickerPlot = new NOColorPickerPlot();
+			PickerPlot = new NOColorPickerPlot() {name = "color-picker__plot" };
 			PickerPlot.RegisterCallback<ChangeEvent<Vector2>>(OnPlotChange);
 			
-			PickerColorPreview = new VisualElement() { name = "color-picker-drag-handle-color-preview" };
+			PickerColorPreview = new VisualElement() { name = "color-picker__drag-handle-color-preview" };
 			PickerColorPreview.AddToClassList(NOUSS.ColorPickerPlotPreviewClass);
 			
-			SliderColorPreview = new VisualElement() { name = "color-slider-drag-handle-color-preview" };
+			SliderColorPreview = new VisualElement() { name = "color-slider__drag-handle-color-preview" };
 			SliderColorPreview.AddToClassList(NOUSS.ColorPickerSliderPreviewClass);
 
-			PickerSlider = new NOColorPickerSlider(SliderDirection.Vertical);
+			PickerSlider = new NOColorPickerSlider(SliderDirection.Vertical) {name = "color-picker__slider" };
 			PickerSlider.RegisterCallback<ChangeEvent<float>>(OnSliderChange);
 			
 			InputContainer.Add(PickerPlot);
