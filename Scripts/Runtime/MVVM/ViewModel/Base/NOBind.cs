@@ -21,18 +21,20 @@ namespace NiqonNO.UI.MVVM
 		private bool BinByName => (BindBy & BindType.Name) != 0 && !string.IsNullOrEmpty(BindName);
 		private bool BinByClass => (BindBy & BindType.Class) != 0 && !string.IsNullOrEmpty(BindClass);
 		
-		public VisualElement QueryTarget(VisualElement root)
+		public VisualElement QueryTarget(VisualElement root) => QueryTarget<VisualElement>(root);
+		public T QueryTarget<T>(VisualElement root) where T : VisualElement
 		{
 			if (BindBy == BindType.None) return null;
 			
-			return root.Q(BinByName? BindName: null, BinByClass? BindClass: null);
+			return root.Q<T>(BinByName? BindName: null, BinByClass? BindClass: null);
 		}
 		
-		public List<VisualElement> QueryTargets(VisualElement root)
+		public List<VisualElement> QueryTargets(VisualElement root) => QueryTargets<VisualElement>(root);
+		public List<T> QueryTargets<T>(VisualElement root) where T : VisualElement
 		{
 			if (BindBy == BindType.None) return null;
 			
-			var query = root.Query();
+			var query = root.Query<T>();
 
 			if (BinByName)
 				query = query.Name(BindName);
