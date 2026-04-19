@@ -20,6 +20,8 @@ namespace NiqonNO.UI
 		public const string CategorySuffix = "__category";
 		public const string DropdownSuffix = "__dropdown";
 		public const string BorderSuffix = "__border";
+		public const string BackgroundSuffix = "__background";
+		public const string HighlightSuffix = "__highlight";
 		
 		public const string Container = "-container";
 		public const string Space = "--";
