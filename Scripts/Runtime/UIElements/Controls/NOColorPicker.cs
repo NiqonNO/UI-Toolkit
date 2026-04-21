@@ -18,7 +18,7 @@ namespace NiqonNO.UI
 
 		private Color _ColorValue;
 		[UxmlAttribute, CreateProperty]
-		private Color ColorValue
+		public  Color ColorValue
 		{
 			get => _ColorValue;
 			set
@@ -35,7 +35,13 @@ namespace NiqonNO.UI
 			set
 			{
 				if (value == _ColorValue) return;
+				var previousValue = _ColorValue;
 				_ColorValue = value;
+				using (var e = ChangeEvent<Color>.GetPooled(previousValue, _ColorValue))
+				{
+					e.target = this;
+					SendEvent(e);
+				}
 				NotifyPropertyChanged(ColorProperty);
 			}
 		}

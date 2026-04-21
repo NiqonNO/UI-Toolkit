@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,7 +10,7 @@ namespace NiqonNO.UI
 		private readonly VisualElement ScrollerViewport;
 		private readonly VisualElement ScrollerContainer;
 		
-		public NOMultiCategoryScrollView(List<string> categories) : base()
+		public NOMultiCategoryScrollView() : base()
 		{
 			NOUSS.TryToApplyStyle(this, NOUSS.MultiCategoryScrollViewStylePath);
 			AddToClassList(NOUSS.MultiCategoryScrollViewClass);
@@ -25,7 +24,7 @@ namespace NiqonNO.UI
 			ScrollerContainer = new VisualElement() { name = "preset-scroller__content" };
 			ScrollerContainer.AddToClassList(NOUSS.MultiCategoryScrollViewContentListContentClass);
 			
-			Dropdown = new DropdownField(categories, categories[0]) { name = "preset-scroller__category-dropdown" };
+			Dropdown = new DropdownField() { name = "preset-scroller__category-dropdown" };
 			Dropdown.AddToClassList(NOUSS.MultiCategoryScrollViewDropdownClass);
 			Dropdown.RegisterCallback<ChangeEvent<string>>(OnDropdownValueChanged);
 
