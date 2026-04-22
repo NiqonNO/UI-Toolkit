@@ -1,4 +1,5 @@
-using UnityEngine;
+using System.Collections.Generic;
+using NiqonNO.UI.MVVM;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI
@@ -10,6 +11,9 @@ namespace NiqonNO.UI
 		private readonly VisualElement ScrollerViewport;
 		private readonly VisualElement ScrollerContainer;
 		
+		private readonly List<VisualElement> Tabs = new();
+		private int CurrentIndex = -1;
+        
 		public NOMultiCategoryScrollView() : base()
 		{
 			NOUSS.TryToApplyStyle(this, NOUSS.MultiCategoryScrollViewStylePath);
@@ -38,10 +42,43 @@ namespace NiqonNO.UI
 		{
 			ScrollerViewport.Add(element);
 		}
+
+		public void SetCategories(IReadOnlyList<INOBindingCategory> categories)
+		{
+			string[] dropdownChoices = new string[categories.Count];
+			for (var i = 0; i < categories.Count; i++)
+			{
+				var category = categories[i];
+				dropdownChoices[i] = category.CategoryName;
+				var tab = new VisualElement() { name = $"preset-scroller__tab-{category.CategoryName}" };
+				ScrollerContainer.AddToClassList(NOUSS.MultiCategoryScrollViewContentListTabClass);
+				Tabs.Add(tab);
+				base.contentContainer.Add(tab);
+
+				foreach (var item in category.ItemsCollection)
+				{
+					var tile = category.ItemTemplate.Instantiate();
+					ScrollerContainer.AddToClassList(NOUSS.MultiCategoryScrollViewContentListTileClass);
+					item.Bind(tile);
+					tab.Add(tile);
+				}
+			}
+
+			SelectTab(0);
+		}
+
+		private void SelectTab(int idx)
+		{
+			if (CurrentIndex >= 0)
+				Tabs[CurrentIndex].SetCheckedPseudoState(false);
+
+			CurrentIndex = idx;
+			Tabs[CurrentIndex].SetCheckedPseudoState(false);
+		}
 		
 		private void OnDropdownValueChanged(ChangeEvent<string> evt)
 		{
-			Debug.Log($"[NOMultiCategoryScrollView] 1 - {evt.newValue} {Dropdown.index} - {Dropdown.choices[Dropdown.index]}");
+			SelectTab(Dropdown.index);
 		}
 	}
 }

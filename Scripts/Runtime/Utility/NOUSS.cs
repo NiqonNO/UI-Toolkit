@@ -15,6 +15,7 @@ namespace NiqonNO.UI
 		public const string TrackerSuffix = "__tracker";
 		public const string HandleSuffix = "__handle";
 		public const string DragAreaSuffix = "__drag-area";
+		public const string TabSuffix = "__tab";
 		public const string TileSuffix = "__tile";
 		public const string PreviewSuffix = "__preview";
 		public const string CategorySuffix = "__category";
@@ -91,6 +92,8 @@ namespace NiqonNO.UI
 		public const string MultiCategoryScrollViewDropdownClass = MultiCategoryScrollViewClass + DropdownSuffix;
 		public const string MultiCategoryScrollViewContentListViewportClass = MultiCategoryScrollViewClass + ViewportSuffix + Container;
 		public const string MultiCategoryScrollViewContentListContentClass = MultiCategoryScrollViewClass + ContentSuffix + Container;
+		public const string MultiCategoryScrollViewContentListTabClass = MultiCategoryScrollViewClass + TabSuffix;
+		public const string MultiCategoryScrollViewContentListTileClass = MultiCategoryScrollViewClass + TileSuffix;
 
 		public static void TryToApplyStyle(VisualElement element, string path)
 		{
