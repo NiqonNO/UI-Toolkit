@@ -7,13 +7,19 @@ using UnityEditor.UIElements;
 namespace NiqonNO.UI.Editor.Converters
 {
 
-	public class NOListStateConverter : NOListStateConverter<INOBindingContext>
+	public class NOListContextConverter : NOListConverter<INOBindingContext>
 	{
 		protected override string DataToString(INOBindingContext item) => string.Empty;
 		protected override INOBindingContext DataFromString(string data) => default;
 	}
 	
-	public abstract class NOListStateConverter<T> : UxmlAttributeConverter<List<T>>
+	public class NOListCategoryConverter : NOListConverter<INOBindingCategory>
+	{
+		protected override string DataToString(INOBindingCategory item) => string.Empty;
+		protected override INOBindingCategory DataFromString(string data) => default;
+	}
+	
+	public abstract class NOListConverter<T> : UxmlAttributeConverter<List<T>>
 	{
 		public override List<T> FromString(string value)
 		{
