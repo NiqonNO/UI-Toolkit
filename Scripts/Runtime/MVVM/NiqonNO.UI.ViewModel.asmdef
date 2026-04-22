@@ -1,14 +1,11 @@
 {
-    "name": "NiqonNO.UI.Editor",
-    "rootNamespace": "NiqonNO.UI.Editor",
+    "name": "NiqonNO.UI.ViewModel",
+    "rootNamespace": "",
     "references": [
-        "GUID:7a4a295175df90940b5c0b8c4f7b528c",
-        "GUID:dea22fa7a3228384d8fe36c5dc4c4a7b",
+        "GUID:4925df66c94da9345b78305696ea4beb",
         "GUID:f63e5dc7922b2f2429e854dabdc799ab"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

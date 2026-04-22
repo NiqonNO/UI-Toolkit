@@ -1,3 +1,4 @@
+using NiqonNO.UI.View;
 using UnityEngine;
 
 namespace NiqonNO.UI.MVVM

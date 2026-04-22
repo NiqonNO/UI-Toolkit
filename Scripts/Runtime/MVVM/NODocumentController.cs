@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using NiqonNO.Core;
-using NiqonNO.UI.Callbacks;
+using NiqonNO.UI.MVVM.Callbacks;
 using Sirenix.OdinInspector;
 using Unity.Properties;
 using UnityEngine;
