@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 namespace NiqonNO.UI.View
 {
     [UxmlElement]
-    public partial class NOToggleSelector : NOCollectionView<INOBindingContext>
+    public partial class NOToggleSelector : NOCollectionView<INOBindingData>
     {
         private readonly Label LabelElement;
         private readonly VisualElement InputContainer;
@@ -313,7 +313,7 @@ namespace NiqonNO.UI.View
             SetIndex(SelectedIndex - 1);
         }
 
-        private void BindTileData(VisualElement visualElement, INOBindingContext dataCollection)
+        private void BindTileData(VisualElement visualElement, INOBindingData dataCollection)
         {
             dataCollection?.Bind(visualElement);
         }

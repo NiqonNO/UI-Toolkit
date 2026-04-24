@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
@@ -12,6 +13,8 @@ namespace NiqonNO.UI.View
 		
 		private readonly List<VisualElement> Tabs = new();
 		private int CurrentIndex = -1;
+
+		public event Action<INOBindingData> OnItemSelected;
         
 		public NOMultiCategoryScrollView() : base()
 		{
@@ -57,6 +60,7 @@ namespace NiqonNO.UI.View
 				{
 					var tile = category.ItemTemplate.Instantiate();
 					tile.AddToClassList(NOUSS.MultiCategoryScrollViewContentListTileClass);
+					tile.AddManipulator(new Clickable(_ => SelectItem(item)));
 					item.Bind(tile);
 					tab.Add(tile);
 				}
@@ -66,6 +70,11 @@ namespace NiqonNO.UI.View
 			Dropdown.index = 0;
 		}
 
+		private void SelectItem(INOBindingData item)
+		{
+			OnItemSelected?.Invoke(item);
+		}
+		
 		private void SelectTab(int idx)
 		{
 			if (CurrentIndex >= 0)
