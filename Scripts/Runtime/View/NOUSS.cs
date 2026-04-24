@@ -88,10 +88,7 @@ namespace NiqonNO.UI.View
 		
 		public const string MultiCategoryScrollViewStylePath = "uss_Multi Scroll View";
 		public const string MultiCategoryScrollViewClass = "multi-scroll-view";
-		public const string MultiCategoryScrollViewCategoryClass = MultiCategoryScrollViewClass + CategorySuffix;
 		public const string MultiCategoryScrollViewDropdownClass = MultiCategoryScrollViewClass + DropdownSuffix;
-		public const string MultiCategoryScrollViewContentListViewportClass = MultiCategoryScrollViewClass + ViewportSuffix + Container;
-		public const string MultiCategoryScrollViewContentListContentClass = MultiCategoryScrollViewClass + ContentSuffix + Container;
 		public const string MultiCategoryScrollViewContentListTabClass = MultiCategoryScrollViewClass + TabSuffix;
 		public const string MultiCategoryScrollViewContentListTileClass = MultiCategoryScrollViewClass + TileSuffix;
 
