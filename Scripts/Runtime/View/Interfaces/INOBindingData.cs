@@ -2,7 +2,7 @@
 
 namespace NiqonNO.UI.View
 {
-	public interface INOBindingData<T>
+	public interface INOBindingData<T> : INOBindingData
 	{
 		public T Data { get; }
 	}
