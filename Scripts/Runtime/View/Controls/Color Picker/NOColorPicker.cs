@@ -148,9 +148,9 @@ namespace NiqonNO.UI.View
 		
 		Vector3 GetHSV() => PickerPlotType switch
 		{
-			ColorPickerType.ValueSaturation_Hue => new Vector3(PickerSlider.value, PickerPlot.value.x, PickerPlot.value.y),
-			ColorPickerType.HueValue_Saturation => new Vector3(PickerPlot.value.y, PickerSlider.value, PickerPlot.value.x),
-			ColorPickerType.HueSaturation_Value => new Vector3(PickerPlot.value.y, PickerPlot.value.x, PickerSlider.value),
+			ColorPickerType.ValueSaturation_Hue => new Vector3(PickerSlider.value,PickerPlot.RawValue.x, PickerPlot.RawValue.y),
+			ColorPickerType.HueValue_Saturation => new Vector3(PickerPlot.RawValue.y, PickerSlider.value, PickerPlot.RawValue.x),
+			ColorPickerType.HueSaturation_Value => new Vector3(PickerPlot.RawValue.y, PickerPlot.RawValue.x, PickerSlider.value),
 			_ => Vector3.one
 		};
 

@@ -22,6 +22,8 @@ namespace NiqonNO.UI.View
 
 		private bool UsePolarCoordinates;
 		private Vector2 Offests = Vector2.up;
+		
+		public Vector2 RawValue { get; private set; }
 
 		public NOColorPickerPlot() : this(DrawerShader) { }
 		public NOColorPickerPlot(Shader pickerDrawerShader) : base(string.Empty, new VisualElement())
@@ -50,6 +52,7 @@ namespace NiqonNO.UI.View
 		
 		public override void SetValueWithoutNotify(Vector2 newValue)
 		{
+			RawValue = newValue;
 			if(UsePolarCoordinates)
 				newValue.x = NOMath.Remap(newValue.x, 0, 1, Offests.x, Offests.y);
 			base.SetValueWithoutNotify(newValue);
