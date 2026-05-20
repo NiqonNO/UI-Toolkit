@@ -17,11 +17,11 @@ namespace NiqonNO.UI.View.Callbacks
 	public abstract class NOCallback<T> : NOCallback where T : EventBase<T>, new()
 	{
 		[field: SerializeField, PropertyOrder(float.MaxValue)] 
-		private UnityEvent Callback { get; set; }
+		private UnityEvent<T> Callback { get; set; }
 
 		public override void Register(NOCallbackManipulator target) => target.RegisterCallback(this);
 		public override void Unregister(NOCallbackManipulator target) => target.UnregisterCallback(this);
 		
-		public virtual void Invoke(T evt) => Callback?.Invoke();
+		public virtual void Invoke(T evt) => Callback?.Invoke(evt);
 	}
 }
