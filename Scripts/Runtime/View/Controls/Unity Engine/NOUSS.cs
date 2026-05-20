@@ -17,6 +17,7 @@ namespace NiqonNO.UI.View
 		public const string DragAreaSuffix = "__drag-area";
 		public const string TabSuffix = "__tab";
 		public const string TileSuffix = "__tile";
+		public const string TextSuffix = "__text";
 		public const string PreviewSuffix = "__preview";
 		public const string CategorySuffix = "__category";
 		public const string DropdownSuffix = "__dropdown";
@@ -35,6 +36,12 @@ namespace NiqonNO.UI.View
 		public const string SquareModifier = "--square";
 		public const string OpenModifier = "--open";
 		public const string EndModifier = "--close";
+		
+		public const string ToggleButtonClass = "toggle-button";
+		public const string ToggleButtonLabelClass = ToggleButtonClass + LabelSuffix;
+		public const string ToggleButtonInputContainerClass = ToggleButtonClass + InputSuffix + Container;
+		public const string ToggleButtonIconClass = ToggleButtonClass + IconSuffix;
+		public const string ToggleButtonTextClass = ToggleButtonClass + TextSuffix;
 		
 		public const string TernaryStylePath = "uss_Ternary";
 		public const string TernaryClass = "ternary-slider";
