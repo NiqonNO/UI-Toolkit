@@ -1,12 +1,15 @@
-using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace NiqonNO.UI.View
 {
-	[InitializeOnLoad]
 	public static class NOGlobalConverters
 	{
-		static NOGlobalConverters()
+#if UNITY_EDITOR
+		[UnityEditor.InitializeOnLoadMethod]
+#else
+		[UnityEngine.RuntimeInitializeOnLoadMethod]
+#endif
+		static void InitializeConverters()
 		{
 			ConverterGroup BoolToDisplay = new("Bool To Display");
 			BoolToDisplay.AddConverter((ref bool value) => new StyleEnum<DisplayStyle>(value ? DisplayStyle.Flex : DisplayStyle.None));
