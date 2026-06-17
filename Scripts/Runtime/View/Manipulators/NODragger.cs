@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,6 +7,8 @@ namespace NiqonNO.UI.View
 	public class NODragger : PointerManipulator
 	{
 		private readonly VisualElement DragTarget;
+		
+		public event Action<Rect> OnRectChanged;
 
 		private bool IsActive;
 		private Vector2 Start;
@@ -80,6 +83,8 @@ namespace NiqonNO.UI.View
 
 			DragTarget.style.left = position.x;
 			DragTarget.style.top = position.y;
+			
+			OnRectChanged?.Invoke(position);
 		}
 	}
 }
