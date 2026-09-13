@@ -18,6 +18,10 @@ namespace NiqonNO.UI.View
 			ConverterGroup InverseBoolToDisplay = new("Inverse Bool To Display");
 			InverseBoolToDisplay.AddConverter((ref bool value) => new StyleEnum<DisplayStyle>(value ? DisplayStyle.None : DisplayStyle.Flex));
 			ConverterGroups.RegisterConverterGroup(InverseBoolToDisplay);
+			
+			ConverterGroup InverseBool = new("Inverse Bool");
+			InverseBool.AddConverter((ref bool value) =>!value);
+			ConverterGroups.RegisterConverterGroup(InverseBool);
 		}
 	}
 }
