@@ -11,6 +11,10 @@ namespace NiqonNO.UI.View
 #endif
 		static void InitializeConverters()
 		{
+			ConverterGroup InverseBool = new("Inverse Bool");
+			InverseBool.AddConverter((ref bool value) =>!value);
+			ConverterGroups.RegisterConverterGroup(InverseBool);
+			
 			ConverterGroup BoolToDisplay = new("Bool To Display");
 			BoolToDisplay.AddConverter((ref bool value) => new StyleEnum<DisplayStyle>(value ? DisplayStyle.Flex : DisplayStyle.None));
 			ConverterGroups.RegisterConverterGroup(BoolToDisplay);
@@ -19,9 +23,13 @@ namespace NiqonNO.UI.View
 			InverseBoolToDisplay.AddConverter((ref bool value) => new StyleEnum<DisplayStyle>(value ? DisplayStyle.None : DisplayStyle.Flex));
 			ConverterGroups.RegisterConverterGroup(InverseBoolToDisplay);
 			
-			ConverterGroup InverseBool = new("Inverse Bool");
-			InverseBool.AddConverter((ref bool value) =>!value);
-			ConverterGroups.RegisterConverterGroup(InverseBool);
+			ConverterGroup BoolToPicking = new("Bool To Picking");
+			BoolToPicking.AddConverter((ref bool value) => new StyleEnum<PickingMode>(value ? PickingMode.Position : PickingMode.Ignore));
+			ConverterGroups.RegisterConverterGroup(BoolToPicking);
+
+			ConverterGroup InverseBoolToPicking = new("Inverse Bool To Picking");
+			InverseBoolToPicking.AddConverter((ref bool value) => new StyleEnum<PickingMode>(value ? PickingMode.Ignore : PickingMode.Position));
+			ConverterGroups.RegisterConverterGroup(InverseBoolToPicking);
 		}
 	}
 }
