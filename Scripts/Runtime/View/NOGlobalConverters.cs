@@ -24,11 +24,11 @@ namespace NiqonNO.UI.View
 			ConverterGroups.RegisterConverterGroup(InverseBoolToDisplay);
 			
 			ConverterGroup BoolToPicking = new("Bool To Picking");
-			BoolToPicking.AddConverter((ref bool value) => new StyleEnum<PickingMode>(value ? PickingMode.Position : PickingMode.Ignore));
+			BoolToPicking.AddConverter((ref bool value) => value ? PickingMode.Position : PickingMode.Ignore);
 			ConverterGroups.RegisterConverterGroup(BoolToPicking);
 
 			ConverterGroup InverseBoolToPicking = new("Inverse Bool To Picking");
-			InverseBoolToPicking.AddConverter((ref bool value) => new StyleEnum<PickingMode>(value ? PickingMode.Ignore : PickingMode.Position));
+			InverseBoolToPicking.AddConverter((ref bool value) => value ? PickingMode.Ignore : PickingMode.Position);
 			ConverterGroups.RegisterConverterGroup(InverseBoolToPicking);
 		}
 	}
